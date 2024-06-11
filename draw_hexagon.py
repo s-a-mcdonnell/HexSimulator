@@ -156,14 +156,16 @@ pygame.display.set_caption("Draw Hexagon")
 hex_matrix = hex_matrix_init()
 
 # Update the state of a few hexagons to reflect motion
-hex_matrix[0][0].movable = True
+'''hex_matrix[0][0].movable = True
 hex_matrix[0][0].state[5] = 2
 hex_matrix[10][10].movable = True
 hex_matrix[10][10].state[0] = 1
 hex_matrix[4][7].movable = True
 hex_matrix[4][7].state[3] = 3
 hex_matrix[6][10].movable = True
-hex_matrix[6][10].state[2] = 1
+hex_matrix[6][10].state[2] = 1'''
+hex_matrix[5][6].state[3] = 1
+hex_matrix[5][11].state[0] = 1
 
 # Create second matrix to alternate with
 alt_matrix = hex_matrix_init()
