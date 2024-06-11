@@ -1,9 +1,6 @@
 class Hex:
    @staticmethod
    def create_coor(x, y):
-        # __ x-=40
-        # __ y-=490
-        # __ return [(x, y), (x+40, y), (x+60, y+35), (x+40, y+70), (x, y+70), (x-20, y+35)]
         # Making hex smaller so that borders will be visible
         return [(x+3, y+3), (x+37, y+3), (x+57, y+35), (x+37, y+67), (x+3, y+67), (x-17, y+35)]
 
@@ -28,7 +25,6 @@ class Hex:
 
         # create the display surface object
         # of specific dimension..e(X, Y).
-       # __ self.display_surface = pygame.display.set_mode((X, Y))
        self.display_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # create a font object.
@@ -46,8 +42,7 @@ class Hex:
        self.textRect = self.text.get_rect()
         
        # set the center of the rectangular object.
-       # __ self.textRect.center = (x + 30, y + 35)
-       self.textRect.center = (self.coordinates[0][0] + 10, self.coordinates[0][1] + 35)
+       self.textRect.center = (self.x + 20, self.y + 35)
    
    def draw(self, screen):
     if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
@@ -84,12 +79,8 @@ for x in range(15):
         hex_list.append(myHex)
 
 # Update the state of a few hexagons to reflect motion
-# __ hex_matrix[1][1].state[0] = 1
-# __ hex_matrix[2][3].state[4] = 1
-# __ hex_matrix[5][2].state[2] = 1
 hex_matrix[10][10].state[0] = 1
 hex_matrix[4][7].state[3] = 3
-# __ hex_matrix[8][12].state[4] = 1
 hex_matrix[6][10].state[2] = 1
 
 run = True
