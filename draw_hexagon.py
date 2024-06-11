@@ -73,6 +73,9 @@ class Hex:
 
         # If its lower neighbor is pointing up, it will point up in the future
         if self.list_index + 1 < len(this_world[self.matrix_index]):
+            print('state 0 check')
+            print('length: ' + str(len(this_world[self.matrix_index])))
+            print('trying to access index: ' + str(self.list_index + 1))
             future_hex.state[0] = this_world[self.matrix_index][self.list_index + 1].state[0]
 
         # If its lower right neighbor is pointing up and left, it will point up and left in the future
@@ -80,7 +83,13 @@ class Hex:
             future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
-        if self.matrix_index - 1 > 0 & self.list_index + 1 < len(this_world[self.matrix_index - 1]):
+        cont = self.list_index + 1 < len(this_world[self.matrix_index - 1])
+        if self.matrix_index - 1 > 0 & cont:
+            print('state 1 check')
+            print('length: ' + str(len(this_world[self.matrix_index - 1])))
+            print('trying to access index: ' + str(self.list_index + 1))
+            print('boolean check: ' + str(self.list_index + 1 < len(this_world[self.matrix_index - 1])))
+            print('boolean check 2: ' + str(cont))
             future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
 
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
@@ -91,7 +100,7 @@ class Hex:
         if self.matrix_index + 1 < len(this_world) & self.list_index - 1 > 0:
             future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
         
-        # Update occupied boolean and color
+        '''# Update occupied boolean and color
         if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
             self.occupied = True
             # If it is occupied and moving, blue
@@ -103,7 +112,21 @@ class Hex:
             # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to white")    
         else:
             # If it is not occupied, red
-            self.color = (255, 0, 0)
+            self.color = (255, 0, 0)'''
+        
+        # Update occupied boolean and color
+        if future_hex.state[0] | future_hex.state[1] | future_hex.state[2] | future_hex.state[3] | future_hex.state[4] | future_hex.state[5]:
+            future_hex.occupied = True
+            # If it is occupied and moving, blue
+            future_hex.color = (0, 0, 255)
+            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to blue")    
+        elif future_hex.occupied:
+            # If it is occupied and not moving, white
+            future_hex.color = (255, 255, 255)
+            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to white")    
+        else:
+            # If it is not occupied, red
+            future_hex.color = (255, 0, 0)
 
 def hex_matrix_init():
     matrix = []
