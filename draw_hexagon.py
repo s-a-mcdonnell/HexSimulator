@@ -84,7 +84,7 @@ class Hex:
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
         cont = self.list_index + 1 < len(this_world[self.matrix_index - 1])
-        if self.matrix_index - 1 > 0 & cont:
+        if (self.matrix_index - 1 > 0) and (cont):
             print('state 1 check')
             print('length: ' + str(len(this_world[self.matrix_index - 1])))
             print('trying to access index: ' + str(self.list_index + 1))
