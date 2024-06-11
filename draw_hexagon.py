@@ -56,7 +56,7 @@ class Hex:
 
     # TODO: Write description
    def update(self):
-        print("Updating " + str(self.matrix_index) + ", " + str(self.list_index))
+        # __ print("Updating " + str(self.matrix_index) + ", " + str(self.list_index))
 
         future_hex = next_world[self.matrix_index][self.list_index]
 
@@ -216,9 +216,9 @@ while run:
                 # If a hex is movable, update it
                 hexagon.update()
 
-    '''# Alternate curr_world between 0 and 1
+    # Alternate curr_world between 0 and 1
     curr_world += 1
-    curr_world %= 2'''
+    curr_world %= 2
 
 pygame.quit()
 
