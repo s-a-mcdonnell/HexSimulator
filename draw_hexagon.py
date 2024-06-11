@@ -73,9 +73,9 @@ class Hex:
 
         # If its lower neighbor is pointing up, it will point up in the future
         if self.list_index + 1 < len(this_world[self.matrix_index]):
-            print('state 0 check')
+            '''print('state 0 check')
             print('length: ' + str(len(this_world[self.matrix_index])))
-            print('trying to access index: ' + str(self.list_index + 1))
+            print('trying to access index: ' + str(self.list_index + 1))'''
             future_hex.state[0] = this_world[self.matrix_index][self.list_index + 1].state[0]
 
         # If its lower right neighbor is pointing up and left, it will point up and left in the future
@@ -83,13 +83,12 @@ class Hex:
             future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
-        cont = self.list_index + 1 < len(this_world[self.matrix_index - 1])
-        if (self.matrix_index - 1 > 0) and (cont):
-            print('state 1 check')
+        if (self.matrix_index - 1 > 0) and (self.list_index + 1 < len(this_world[self.matrix_index - 1])):
+            '''print('state 1 check')
             print('length: ' + str(len(this_world[self.matrix_index - 1])))
             print('trying to access index: ' + str(self.list_index + 1))
             print('boolean check: ' + str(self.list_index + 1 < len(this_world[self.matrix_index - 1])))
-            print('boolean check 2: ' + str(cont))
+            print('boolean check 2: ' + str(cont))'''
             future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
 
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
@@ -97,7 +96,7 @@ class Hex:
             future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
 
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
-        if self.matrix_index + 1 < len(this_world) & self.list_index - 1 > 0:
+        if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
             future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
         
         '''# Update occupied boolean and color
