@@ -7,8 +7,9 @@ class Hex:
 
     # Constructor
     # color is an optional parameter with a default value of red
-    # moveable is an optional parameter with a default value of true
-   def __init__(self, matrix_index, list_index, color=(255, 0, 0), moveable=True):
+    # occupied is an optional parameter with a default value of false
+    # moveable is an optional parameter with a default value of false
+   def __init__(self, matrix_index, list_index, color=(255, 0, 0), occupied=False, moveable=False):
        self.matrix_index = matrix_index
        self.list_index = list_index
 
@@ -18,6 +19,8 @@ class Hex:
        self.coordinates = Hex.create_coor(self.x, self.y)
        
        self.color = color
+
+       self.occupied = occupied
        self.movable = moveable
        self.state = [0, 0, 0, 0, 0, 0]
 
@@ -45,16 +48,42 @@ class Hex:
        self.textRect.center = (self.x + 20, self.y + 35)
    
    def draw(self, screen):
-    if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
+    '''if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
        self.color = (0, 0, 255)
     else:
-        self.color = (255, 0, 0)
+        self.color = (255, 0, 0)'''
     
-    # Draw the hexagon
-    pygame.draw.polygon(screen, self.color, self.coordinates)
+    '''if self.occupied:
+        if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
+            # If it is occupied and moving, blue
+            self.color = (0, 0, 255)
+        else:
+            # If it is occupied and not moving, white
+            self.color = (255, 255, 255)
+    else:
+        # If it is not occupied, red
+        self.color = (255, 0, 0)'''
+    
+        # Draw the hexagon
+        pygame.draw.polygon(screen, self.color, self.coordinates)
 
-    # Draw text object displaying axial hex coordiantes
-    self.display_surface.blit(self.text, self.textRect)
+        # Draw text object displaying axial hex coordiantes
+        self.display_surface.blit(self.text, self.textRect)
+
+    # TODO: Write description
+    def update(self):
+        # If it is non-moveable, copy it over and change nothing
+
+        if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
+            self.occupied = true
+            # If it is occupied and moving, blue
+            self.color = (0, 0, 255)    
+        elif self.occupied:
+            # If it is occupied and not moving, white
+            self.color = (255, 255, 255)
+        else:
+            # If it is not occupied, red
+            self.color = (255, 0, 0)
 
 def hex_matrix_init():
     matrix = []
@@ -118,6 +147,16 @@ while run:
             run = False
 
     pygame.display.update()
+
+    # Alternate curr_world between 0 and 1
+    curr_world += 1
+    curr_world %= 2
+
+    # Update to handle movement
+    # TODO: Update to handle movement
+    for hex_list in worlds[curr_world]:
+        for hexagon in hex_list:
+            hexagon.update()
 
 pygame.quit()
 
