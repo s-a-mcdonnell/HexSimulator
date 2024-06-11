@@ -170,11 +170,11 @@ alt_matrix = hex_matrix_init()
 
 # TODO: Doing the same thing here as for hex_matrix. Is this necessary?
 # Update the state of a few hexagons to reflect motion
-alt_matrix[0][0].state[5] = 2
+'''alt_matrix[0][0].state[5] = 2
 alt_matrix[10][10].state[0] = 1
 alt_matrix[10][10].occupied = True
 alt_matrix[4][7].state[3] = 3
-alt_matrix[6][10].state[2] = 1
+alt_matrix[6][10].state[2] = 1'''
 
 worlds = [hex_matrix, alt_matrix]
 
@@ -190,9 +190,9 @@ while run:
     screen.fill((0, 0, 0))
 
     # Draw hexagons
-    r = 10
+    '''r = 10
     g = 10
-    b = 10
+    b = 10'''
     for hex_list in worlds[curr_world]:
         for hexagon in hex_list:
             hexagon.draw(screen)
@@ -210,6 +210,7 @@ while run:
         for hexagon in hex_list:
             # Copy unmovables into the other world
             if not hexagon.movable:
+                # TODO: If everything is set up right initially, this shouldn't be necessary
                 next_world[hexagon.matrix_index][hexagon.list_index].movable = False
                 next_world[hexagon.matrix_index][hexagon.list_index].state = [0,0,0,0,0,0]
             else:
@@ -219,6 +220,11 @@ while run:
     # Alternate curr_world between 0 and 1
     curr_world += 1
     curr_world %= 2
+
+    # TODO: Do this more elegantly
+    # Slow the whole thing down
+    for i in range(10000000):
+        i += 1
 
 pygame.quit()
 
