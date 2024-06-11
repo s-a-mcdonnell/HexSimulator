@@ -56,6 +56,19 @@ class Hex:
     # Draw text object displaying axial hex coordiantes
     self.display_surface.blit(self.text, self.textRect)
 
+def hex_matrix_init():
+    matrix = []
+
+    for x in range(15):
+        list = []
+        matrix.append(list)
+
+        for y in range(16):
+            myHex = Hex(x, y)
+            list.append(myHex)
+
+    return matrix
+
 import pygame
 
 pygame.init()
@@ -66,19 +79,13 @@ SCREEN_HEIGHT = 600
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Draw Hexagon")
+    
 
 # Create hexagons
-hex_matrix = []
-
-for x in range(15):
-    hex_list = []
-    hex_matrix.append(hex_list)
-
-    for y in range(16):
-        myHex = Hex(x, y)
-        hex_list.append(myHex)
+hex_matrix = hex_matrix_init()
 
 # Update the state of a few hexagons to reflect motion
+hex_matrix[0][0].state[5] = 2
 hex_matrix[10][10].state[0] = 1
 hex_matrix[4][7].state[3] = 3
 hex_matrix[6][10].state[2] = 1
