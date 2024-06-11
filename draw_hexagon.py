@@ -66,9 +66,24 @@ class Hex:
 
         future_hex.occupied = False
 
-        # If its upper neighbor is pointing down, it will point down in the future
         if self.list_index - 1 > 0:
+            # If its upper neighbor is pointing down, it will point down in the future
             future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
+            # If its upper neighbor is a wall and it is moving up and to the right, it will move down and to the right
+            # TODO: Do I need to check if an unmovable object is occupied?
+            # TODO: Add similar statements coping with walls to the conditionals checking the other neighbors (write a function taking advantage of the fact that 2 and 4 are adjacent to 3?)
+            if not this_world[self.matrix_index][self.list_index - 1].movable:
+                print("Unmovable neighbor found")
+                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
+                print("My states are " + str(self.state))
+                if self.state[1]:
+                    # TODO: Seems dangerous to edit current array, and this only protects when I read in a certain order, anyway
+                    self.state[1] = 0
+                    future_hex.state[2] = 1
+                if self.state[5]:
+                    # TODO: Seems dangerous to edit current array
+                    self.state[5] = 0
+                    future_hex.state[4] = 1
 
         # If its lower neighbor is pointing up, it will point up in the future
         if self.list_index + 1 < len(this_world[self.matrix_index]):
@@ -90,7 +105,9 @@ class Hex:
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
             future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
 
-        
+        # TODO: Handle collisions with walls
+
+
         # Update occupied boolean and color
         if future_hex.state[0] | future_hex.state[1] | future_hex.state[2] | future_hex.state[3] | future_hex.state[4] | future_hex.state[5]:
             future_hex.occupied = True
@@ -143,18 +160,28 @@ hex_matrix[4][7].state[3] = 3
 hex_matrix[6][10].movable = True
 hex_matrix[6][10].state[2] = 1'''
 
-# Head-on collision
+# Head-on collision test
 '''hex_matrix[5][6].state[3] = 1
 hex_matrix[5][11].state[0] = 1'''
 
-# Diagonal collision
-hex_matrix[3][7].state[2] = 1
-hex_matrix[3][10].state[1] = 1
+# Diagonal collision test
+'''hex_matrix[3][7].state[2] = 1
+hex_matrix[3][10].state[1] = 1'''
 
 # Create second matrix to alternate with
 alt_matrix = hex_matrix_init()
 
 # TODO: If there are any unmovable hexes, copy them over
+
+# Adjacent wall bounce
+hex_matrix[5][6].movable = False
+hex_matrix[5][6].occupied = True
+alt_matrix[5][6].movable = False
+alt_matrix[5][6].occupied = True
+hex_matrix[2][10].state[1] = 1
+# __ head-on
+# __ hex_matrix[5][11].state[0] = 1
+
 
 worlds = [hex_matrix, alt_matrix]
 
@@ -188,7 +215,10 @@ while run:
             # Copy unmovables into the other world
             if not hexagon.movable:
                 # TODO: If everything is set up right initially, this shouldn't be necessary
+                next_world[hexagon.matrix_index][hexagon.list_index].occupied = True
                 next_world[hexagon.matrix_index][hexagon.list_index].movable = False
+                # __ white for occupied and not moving
+                next_world[hexagon.matrix_index][hexagon.list_index].color = (255, 255, 255)
                 next_world[hexagon.matrix_index][hexagon.list_index].state = [0,0,0,0,0,0]
             else:
                 # If a hex is movable, update it
