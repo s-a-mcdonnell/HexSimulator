@@ -142,8 +142,14 @@ hex_matrix[4][7].movable = True
 hex_matrix[4][7].state[3] = 3
 hex_matrix[6][10].movable = True
 hex_matrix[6][10].state[2] = 1'''
-hex_matrix[5][6].state[3] = 1
-hex_matrix[5][11].state[0] = 1
+
+# Head-on collision
+'''hex_matrix[5][6].state[3] = 1
+hex_matrix[5][11].state[0] = 1'''
+
+# Diagonal collision
+hex_matrix[3][7].state[2] = 1
+hex_matrix[3][10].state[1] = 1
 
 # Create second matrix to alternate with
 alt_matrix = hex_matrix_init()
