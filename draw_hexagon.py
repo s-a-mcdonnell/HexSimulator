@@ -61,9 +61,6 @@ class Hex:
         future_hex = next_world[self.matrix_index][self.list_index]
 
         # If it has one moving neighbor moving towards it, that neighbor's state becomes its own
-        # __ Should I create a new array or just point to the old one?
-        '''if this_world[self.matrix_index][self.list_index - 1].state[3]:
-            future_hex.state[3] = 1'''
         
         # TODO: Condense these conditionals
 
@@ -92,20 +89,7 @@ class Hex:
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
             future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
-        
-        '''# Update occupied boolean and color
-        if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
-            self.occupied = True
-            # If it is occupied and moving, blue
-            self.color = (0, 0, 255)
-            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to blue")    
-        elif self.occupied:
-            # If it is occupied and not moving, white
-            self.color = (255, 255, 255)
-            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to white")    
-        else:
-            # If it is not occupied, red
-            self.color = (255, 0, 0)'''
+
         
         # Update occupied boolean and color
         if future_hex.state[0] | future_hex.state[1] | future_hex.state[2] | future_hex.state[3] | future_hex.state[4] | future_hex.state[5]:
@@ -164,13 +148,7 @@ hex_matrix[5][11].state[0] = 1
 # Create second matrix to alternate with
 alt_matrix = hex_matrix_init()
 
-# TODO: Doing the same thing here as for hex_matrix. Is this necessary?
-# Update the state of a few hexagons to reflect motion
-'''alt_matrix[0][0].state[5] = 2
-alt_matrix[10][10].state[0] = 1
-alt_matrix[10][10].occupied = True
-alt_matrix[4][7].state[3] = 3
-alt_matrix[6][10].state[2] = 1'''
+# TODO: If there are any unmovable hexes, copy them over
 
 worlds = [hex_matrix, alt_matrix]
 
@@ -186,9 +164,6 @@ while run:
     screen.fill((0, 0, 0))
 
     # Draw hexagons
-    '''r = 10
-    g = 10
-    b = 10'''
     for hex_list in worlds[curr_world]:
         for hexagon in hex_list:
             hexagon.draw(screen)
