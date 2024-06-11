@@ -90,8 +90,17 @@ hex_matrix[10][10].state[0] = 1
 hex_matrix[4][7].state[3] = 3
 hex_matrix[6][10].state[2] = 1
 
+# Create second matrix to alternate with
+alt_matrix = hex_matrix_init()
+
+worlds = [hex_matrix, alt_matrix]
+
+# integer to indicate which world we are currently using
+curr_world = 0
+
 run = True
 while run:
+
     # Reset screen
     screen.fill((0, 0, 0))
 
@@ -99,7 +108,7 @@ while run:
     r = 10
     g = 10
     b = 10
-    for hex_list in hex_matrix:
+    for hex_list in worlds[curr_world]:
         for hexagon in hex_list:
             hexagon.draw(screen)
 
