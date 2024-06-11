@@ -8,8 +8,8 @@ class Hex:
     # Constructor
     # color is an optional parameter with a default value of red
     # occupied is an optional parameter with a default value of false
-    # moveable is an optional parameter with a default value of false
-   def __init__(self, matrix_index, list_index, color=(255, 0, 0), occupied=False, moveable=False):
+    # moveable is an optional parameter with a default value of true
+   def __init__(self, matrix_index, list_index, color=(255, 0, 0), occupied=False, moveable=True):
        self.matrix_index = matrix_index
        self.list_index = list_index
 
@@ -48,22 +48,6 @@ class Hex:
        self.textRect.center = (self.x + 20, self.y + 35)
    
    def draw(self, screen):
-    '''if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
-       self.color = (0, 0, 255)
-    else:
-        self.color = (255, 0, 0)'''
-    
-    '''if self.occupied:
-        if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
-            # If it is occupied and moving, blue
-            self.color = (0, 0, 255)
-        else:
-            # If it is occupied and not moving, white
-            self.color = (255, 255, 255)
-    else:
-        # If it is not occupied, red
-        self.color = (255, 0, 0)'''
-    
         # Draw the hexagon
         pygame.draw.polygon(screen, self.color, self.coordinates)
 
@@ -71,16 +55,52 @@ class Hex:
         self.display_surface.blit(self.text, self.textRect)
 
     # TODO: Write description
-    def update(self):
-        # If it is non-moveable, copy it over and change nothing
+   def update(self):
+        print("Updating " + str(self.matrix_index) + ", " + str(self.list_index))
 
+        future_hex = next_world[self.matrix_index][self.list_index]
+
+        # If it has one moving neighbor moving towards it, that neighbor's state becomes its own
+        # __ Should I create a new array or just point to the old one?
+        '''if this_world[self.matrix_index][self.list_index - 1].state[3]:
+            future_hex.state[3] = 1'''
+        
+        # TODO: Condense these conditionals
+
+        # If its upper neighbor is pointing down, it will point down in the future
+        if self.list_index - 1 > 0:
+            future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
+
+        # If its lower neighbor is pointing up, it will point up in the future
+        if self.list_index + 1 < len(this_world[self.matrix_index]):
+            future_hex.state[0] = this_world[self.matrix_index][self.list_index + 1].state[0]
+
+        # If its lower right neighbor is pointing up and left, it will point up and left in the future
+        if self.matrix_index + 1 < len(this_world):
+            future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
+
+        # If its lower left neighbor is pointing up and right, it will point up and right in the future
+        if self.matrix_index - 1 > 0 & self.list_index + 1 < len(this_world[self.matrix_index - 1]):
+            future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
+
+        # If its upper left neighbor is pointing down and right, it will point down and right in the future
+        if self.matrix_index - 1 > 0:
+            future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
+
+        # If its upper right neighbor is pointing down and left, it will point down and left in the future
+        if self.matrix_index + 1 < len(this_world) & self.list_index - 1 > 0:
+            future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
+        
+        # Update occupied boolean and color
         if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
-            self.occupied = true
+            self.occupied = True
             # If it is occupied and moving, blue
-            self.color = (0, 0, 255)    
+            self.color = (0, 0, 255)
+            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to blue")    
         elif self.occupied:
             # If it is occupied and not moving, white
             self.color = (255, 255, 255)
+            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to white")    
         else:
             # If it is not occupied, red
             self.color = (255, 0, 0)
@@ -114,13 +134,25 @@ pygame.display.set_caption("Draw Hexagon")
 hex_matrix = hex_matrix_init()
 
 # Update the state of a few hexagons to reflect motion
+hex_matrix[0][0].movable = True
 hex_matrix[0][0].state[5] = 2
+hex_matrix[10][10].movable = True
 hex_matrix[10][10].state[0] = 1
+hex_matrix[4][7].movable = True
 hex_matrix[4][7].state[3] = 3
+hex_matrix[6][10].movable = True
 hex_matrix[6][10].state[2] = 1
 
 # Create second matrix to alternate with
 alt_matrix = hex_matrix_init()
+
+# TODO: Doing the same thing here as for hex_matrix. Is this necessary?
+# Update the state of a few hexagons to reflect motion
+alt_matrix[0][0].state[5] = 2
+alt_matrix[10][10].state[0] = 1
+alt_matrix[10][10].occupied = True
+alt_matrix[4][7].state[3] = 3
+alt_matrix[6][10].state[2] = 1
 
 worlds = [hex_matrix, alt_matrix]
 
@@ -129,6 +161,8 @@ curr_world = 0
 
 run = True
 while run:
+    this_world = worlds[curr_world]
+    next_world = worlds[(curr_world + 1)%2]
 
     # Reset screen
     screen.fill((0, 0, 0))
@@ -148,15 +182,21 @@ while run:
 
     pygame.display.update()
 
-    # Alternate curr_world between 0 and 1
-    curr_world += 1
-    curr_world %= 2
-
     # Update to handle movement
     # TODO: Update to handle movement
-    for hex_list in worlds[curr_world]:
+    for hex_list in this_world:
         for hexagon in hex_list:
-            hexagon.update()
+            # Copy unmovables into the other world
+            if not hexagon.movable:
+                next_world[hexagon.matrix_index][hexagon.list_index].movable = False
+                next_world[hexagon.matrix_index][hexagon.list_index].state = [0,0,0,0,0,0]
+            else:
+                # If a hex is movable, update it
+                hexagon.update()
+
+    '''# Alternate curr_world between 0 and 1
+    curr_world += 1
+    curr_world %= 2'''
 
 pygame.quit()
 
