@@ -149,9 +149,11 @@ class Hex:
 
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
-            if this_world[self.matrix_index + 1][self.list_index - 1].state[4]:
-                # TODO: Simplify
-                future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
+            # Unless the lower right neighbor (the lower neighbor of the upper right neighbor) is a wall
+            if this_world[self.matrix_index + 1][self.list_index].movable:
+                if this_world[self.matrix_index + 1][self.list_index - 1].state[4]:
+                    # TODO: Simplify
+                    future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
 
         # TODO: Handle collisions with walls
 
@@ -248,12 +250,12 @@ alt_matrix[5][6].movable = False
 alt_matrix[5][6].occupied = True
 hex_matrix[2][10].state[1] = 1'''
 
-# Adjacent wall bounce test (upper wall from the right)
+'''# Adjacent wall bounce test (upper wall from the right)
 hex_matrix[5][6].movable = False
 hex_matrix[5][6].occupied = True
 alt_matrix[5][6].movable = False
 alt_matrix[5][6].occupied = True
-hex_matrix[8][7].state[5] = 1
+hex_matrix[8][7].state[5] = 1'''
 
 '''# Adjacent wall bounce test (lower wall from the left)
 hex_matrix[5][9].movable = False
@@ -261,6 +263,13 @@ hex_matrix[5][9].occupied = True
 alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
 hex_matrix[2][8].state[2] = 1'''
+
+# Adjacent wall bounce test (lower wall from the right)
+hex_matrix[5][9].movable = False
+hex_matrix[5][9].occupied = True
+alt_matrix[5][9].movable = False
+alt_matrix[5][8].occupied = True
+hex_matrix[9][4].state[4] = 1
 # __ head-on
 # __ hex_matrix[5][11].state[0] = 1
 
