@@ -264,12 +264,19 @@ alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
 hex_matrix[2][8].state[2] = 1'''
 
-# Adjacent wall bounce test (lower wall from the right)
+'''# Adjacent wall bounce test (lower wall from the right)
 hex_matrix[5][9].movable = False
 hex_matrix[5][9].occupied = True
 alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
-hex_matrix[9][4].state[4] = 1
+hex_matrix[9][4].state[4] = 1'''
+
+# Adjacent wall bounce test (right wall from above)
+hex_matrix[5][9].movable = False
+hex_matrix[5][9].occupied = True
+alt_matrix[5][9].movable = False
+alt_matrix[5][8].occupied = True
+hex_matrix[4][5].state[3] = 1
 # __ head-on
 # __ hex_matrix[5][11].state[0] = 1
 
