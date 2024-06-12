@@ -54,6 +54,49 @@ class Hex:
         # Draw text object displaying axial hex coordiantes
         self.display_surface.blit(self.text, self.textRect)
 
+   def upper_neighbor_is_wall(self):
+        # If the upper neighbor does not exist, it cannot be a wall
+        if self.list_index - 1 < 0:
+            return False
+
+        return not this_world[self.matrix_index][self.list_index - 1].movable
+   
+   def upper_right_neighbor_is_wall(self):
+        # If the upper right neighbor does not exist, it cannot be a wall
+        if (self.list_index - 1 < 0) or (self.matrix_index + 1 >= len(this_world)):
+            return False
+        
+        return not this_world[self.matrix_index + 1][self.list_index - 1].movable
+   
+   def lower_right_neighbor_is_wall(self):
+        # If the lower right neighbor does not exist, it cannot be a wall
+        if self.matrix_index + 1 >= len(this_world):
+            return False
+        
+        return not this_world[self.matrix_index + 1][self.list_index].movable
+   
+   def lower_neighbor_is_wall(self):
+        # If the lower  neighbor does not exist, it cannot be a wall
+        if self.list_index + 1 >= len(this_world[self.matrix_index]):
+            return False
+        
+        return not this_world[self.matrix_index][self.list_index + 1].movable
+   
+   def lower_left_neighbor_is_wall(self):
+        # If the lower left neighbor does not exist, it cannot be a wall
+        if (self.matrix_index - 1 < 0) or (self.list_index + 1 >= len(this_world[self.matrix_index - 1])):
+            return False
+
+        return not this_world[self.matrix_index - 1][self.list_index + 1].movable
+   
+   def upper_left_neighbor_is_wall(self):
+        # If the upper left neighbor does not exist, it cannot be a wall
+        if self.matrix_index - 1 < 0:
+            return False
+
+        return not this_world[self.matrix_index - 1][self.list_index].movable
+
+   
     # TODO: Write description
    def update(self):
         # __ print("Updating " + str(self.matrix_index) + ", " + str(self.list_index))
@@ -113,6 +156,7 @@ class Hex:
         # If its lower right neighbor is pointing up and left, it will point up and left in the future
         # TODO: Write case for when the lower right neighbor is a wall and it is moving down (state 3 --> state 4)
         if self.matrix_index + 1 < len(this_world):
+
             # Unless the upper right neighbor (the upper neighbor of the lower right neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
             # __if (self.list_index - 1 < 0) or (this_world[self.matrix_index + 1][self.list_index - 1].movable):
@@ -302,19 +346,19 @@ alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
 hex_matrix[9][4].state[4] = 1'''
 
-# Adjacent wall bounce test (right wall from above)
+'''# Adjacent wall bounce test (right wall from above)
 hex_matrix[5][9].movable = False
 hex_matrix[5][9].occupied = True
 alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
-hex_matrix[4][5].state[3] = 1
+hex_matrix[4][5].state[3] = 1'''
 
-'''# Adjacent wall bounce test (right wall from lower left)
+# Adjacent wall bounce test (right wall from lower left)
 hex_matrix[5][9].movable = False
 hex_matrix[5][9].occupied = True
 alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
-hex_matrix[1][13].state[1] = 1'''
+hex_matrix[1][12].state[1] = 1
 # __ head-on
 # __ hex_matrix[5][11].state[0] = 1
 
