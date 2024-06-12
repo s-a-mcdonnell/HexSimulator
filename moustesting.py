@@ -11,6 +11,8 @@ col2 = (0, 150, 150)
 
 col3 = (100, 140, 10)
 
+on = False
+
 #########################################################
 class Hex:
 
@@ -27,16 +29,18 @@ class Hex:
     # moveable is an optional parameter with a default value of true
 
     def __init__(self, matrix_index, list_index, color=col1, moveable=True):
+
         self.matrix_index = matrix_index
         self.list_index = list_index
 
         self.x = 60 * matrix_index - 20
         self.y = 35 * matrix_index + 70 * list_index - 490
 
-        self.hitup = self.y + 55
-        self.hitdown = self.y + 15
-        self.hitr = self.x + 40
-        self.hitl = self.x
+        # for simple movement
+        self.oldx = matrix_index
+        self.oldy = list_index
+
+        #self.dropbox = False
 
         self.coordinates = Hex.create_coor(self.x, self.y)
 
@@ -99,6 +103,10 @@ class Hex:
         # Draw text object displaying axial hex coordiantes
         self.display_surface.blit(self.text, self.textRect)
 
+        #if self.dropbox:
+        #    pygame.draw.polygon(screen, (151, 33, 255), [(self.x + 3, self.y + 3),(self.x + 39, self.y + 3),(self.x + 30, self.y + 20),(self.x + 16, self.y + 20)])
+
+
     def switchitem(self):
         if self.state[0]:
             self.state[0] = 0
@@ -121,7 +129,13 @@ class Hex:
             self.state[0] = 1
 
 
+    #def opendropbox(self):
+    #    self.dropbox = True
 
+    def movea(self, hex_matrix):
+        #if self.oldy+1 < len(hex_matrix[self.oldx]):
+        hex_matrix[self.oldx][self.oldy-1].state[0] = 1
+        self.state[0] = 0
 
 #########################################################
 
@@ -166,6 +180,8 @@ def postohex(position):
     # then changes the state of that hex into an object
     hex_matrix[round(indx)][round(indy)].switchitem()
 
+    #hex_matrix[round(indx)][round(indy)].opendropbox()
+
 #########################################################
 
 run = True
@@ -188,9 +204,24 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        postohex(pygame.mouse.get_pos())
-    # flip() the display to put your work on screen
+    if event.type == pygame.TEXTINPUT:
+        keys = pygame.key.get_pressed()
+        print('key:', keys)
+        if keys[pygame.K_w] & on == False:
+            on = True
+        elif keys[pygame.K_w] & on =w= True:
+            on = False
+
+    if on:
+        for hex_list in hex_matrix:
+            for hexagon in hex_list:
+                if hexagon.state[0] == 1:
+                    hexagon.movea(hex_matrix)
+    else:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            postohex(pygame.mouse.get_pos())
+        # flip() the display to put your work on screen
+
 
     pygame.display.flip()
     # limits FPS to 60
