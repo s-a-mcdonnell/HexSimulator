@@ -78,8 +78,18 @@ class Hex:
 # (x+3, y+3), (x+37, y+3), (x+57, y+35), (x+37, y+67), (x+3, y+67), (x-17, y+35)
     #
     def draw(self, screen):
-        if self.state[0] | self.state[1] | self.state[2] | self.state[3] | self.state[4] | self.state[5]:
-            self.color = col1
+        if self.state[0]:
+            self.color = (151, 33, 255)
+        elif self.state[1]:
+            self.color = (194, 255, 138)
+        elif self.state[2]:
+            self.color = (209, 209, 209)
+        elif self.state[3]:
+            self.color = (2, 115, 104)
+        elif self.state[4]:
+            self.color = (255, 244, 145)
+        elif self.state[5]:
+            self.color = (184, 255, 255)
         else:
             self.color = col2
 
@@ -88,6 +98,30 @@ class Hex:
 
         # Draw text object displaying axial hex coordiantes
         self.display_surface.blit(self.text, self.textRect)
+
+    def switchitem(self):
+        if self.state[0]:
+            self.state[0] = 0
+            self.state[1] = 1
+        elif self.state[1]:
+            self.state[1] = 0
+            self.state[2] = 1
+        elif self.state[2]:
+            self.state[2] = 0
+            self.state[3] = 1
+        elif self.state[3]:
+            self.state[3] = 0
+            self.state[4] = 1
+        elif self.state[4]:
+            self.state[4] = 0
+            self.state[5] = 1
+        elif self.state[5]:
+            self.state[5] = 0
+        else:
+            self.state[0] = 1
+
+
+
 
 #########################################################
 
@@ -119,20 +153,18 @@ for x in range(17):
 
 # check for a hit box
 def postohex(position):
-    print('Mouse button pressed!', position)
 
-    print('Mouse button pressed!', position[0])
+    # the starting point of a hexagon is on the top left corner,
+    # so this assumes the user clicks close to the center and corrects to refrence that part
+    adjposition = (position[0]-20,position[1]-35)
 
-    uum = (position[0]-20,position[1]-35)
-    print('maybe?', uum)
+    # reverses the math to turn a hex matrix index into the hex coordinates
+    indx = (adjposition[0]+20)/60
+    indy = (adjposition[1]+490-(35*indx))/70
 
-    ummx = (uum[0]+20)/60
-    ummy = (uum[1]+490-(35*ummx))/70
-
-    print('intish?', ummx)
-    print('intish?', ummy)
-
-    hex_matrix[round(ummx)][round(ummy)].state[0] = 1
+    # rounds to nearest integer for hex matrix index,
+    # then changes the state of that hex into an object
+    hex_matrix[round(indx)][round(indy)].switchitem()
 
 #########################################################
 
@@ -164,7 +196,7 @@ while run:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(30) / 1000
+    dt = clock.tick(10) / 1000
 
 pygame.quit()
 
