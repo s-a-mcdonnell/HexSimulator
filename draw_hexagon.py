@@ -27,6 +27,31 @@ class Hex:
        self.occupied = occupied
        self.state = [0, 0, 0, 0, 0, 0]
 
+       self.init_text()
+
+   def init_text(self):
+       # Writing text to screen according to this tutorial:https://www.geeksforgeeks.org/python-display-text-to-pygame-window/
+
+        # create the display surface object
+        # of specific dimension..e(X, Y).
+       self.display_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        # create a font object.
+        # 1st parameter is the font file
+        # which is present in pygame.
+        # 2nd parameter is size of the font
+       font = pygame.font.Font('freesansbold.ttf', 15)
+        
+        # create a text surface object,
+        # on which text is drawn on it.
+       self.text = font.render(('(' + str(self.matrix_index) + ',' + str(self.list_index) + ')'), True, (0, 255, 0))
+        
+        # create a rectangular object for the
+        # text surface object
+       self.textRect = self.text.get_rect()
+        
+       # set the center of the rectangular object.
+       self.textRect.center = (self.x + 20, self.y + 35)
    
    def draw(self, screen):
     if self.occupied == False:
@@ -46,7 +71,7 @@ class Hex:
     pygame.draw.polygon(screen, self.color, self.coordinates)
 
     # Draw text object displaying axial hex coordiantes
-    # self.display_surface.blit(self.text, self.textRect)
+    self.display_surface.blit(self.text, self.textRect)
 
 
     
