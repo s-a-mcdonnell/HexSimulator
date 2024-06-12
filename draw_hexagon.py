@@ -24,7 +24,7 @@ class Hex:
        self.movable = moveable
        self.occupied = occupied
        # TODO: Make 7 states?
-       self.state = [0, 0, 0, 0, 0, 0]
+       self.state = [0, 0, 0, 0, 0, 0, 0]
 
     # sets the given hex to act as a wall
    def make_wall(self):
@@ -188,6 +188,11 @@ class Hex:
            if straight_neighbor.state[(dir+3)%6]:
                 future.state[(dir+3)%6] = 1
                 future.occupied = True
+
+                # TODO: Check if this makes sense, describe it
+                # If the hex is stationary and is having a state superimposed on it, mark it as such
+                if self.occupied and self.movable and not self.is_moving:
+                    future.state[6] = True
         
         # handle impact of hitting occupied neighbor
        if(self.state[dir] != 0):
@@ -199,7 +204,7 @@ class Hex:
         future = hex_matrix_new[self.matrix_index][self.list_index]
 
         # TODO: Make state 7 elements long?
-        future.state = [0, 0, 0, 0, 0, 0]
+        future.state = [0, 0, 0, 0, 0, 0, 0]
         future.occupied = False
 
         neighbors_movable = self.check_movables()
@@ -213,6 +218,10 @@ class Hex:
         # If the hex is currently occupied and not moving, it will still be occupied in the next generation
         if(hex_matrix[self.matrix_index][self.list_index].occupied == True) and (not hex_matrix[self.matrix_index][self.list_index].is_moving()):
             future.occupied = True
+        elif self.state[6]:
+            # If a hex has superimposed states, one of which is stationary, it will remain statinary in the next generation
+            future.occupied = True
+            future.state[6] = True
 
         if self.movable:
 
@@ -292,7 +301,7 @@ for x in range(15):
         hex_list_new.append(myHex)
 
 # Update the state of a few hexagons to reflect motion (test cases)
-#hex_matrix[10][8].occupied = True
+'''#hex_matrix[10][8].occupied = True
 hex_matrix[10][4].occupied = True
 # hex_matrix[4][7].occupied = True
 # hex_matrix[6][10].occupied = True
@@ -316,7 +325,12 @@ hex_matrix[5][11].make_move(5)
 #hex_matrix[5][9].make_wall()
 #hex_matrix[6][7].make_wall()
 hex_matrix[7][9].make_wall()
-hex_matrix[7][8].make_wall()
+hex_matrix[7][8].make_wall()'''
+
+# Test case: Two moving hexes colliding at a stationary (non-wall) hex
+hex_matrix[5][8].occupied = True
+hex_matrix[2][8].make_move(2)
+
 
 # Create walls around the edges
 # Left edge
