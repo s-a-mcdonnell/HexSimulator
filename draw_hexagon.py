@@ -105,10 +105,11 @@ class Hex:
                 print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
 
 
-
+        # TODO: Reactivate this: I think it might be messing with the wall bounce case, but it is necessary
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
         if self.matrix_index - 1 > 0:
-            future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
+            if this_world[self.matrix_index - 1][self.list_index].state[2]:
+                future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
 
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
@@ -118,19 +119,21 @@ class Hex:
 
 
         # Update occupied boolean and color
-        if future_hex.state[0] | future_hex.state[1] | future_hex.state[2] | future_hex.state[3] | future_hex.state[4] | future_hex.state[5]:
+        moving = future_hex.state[0] | future_hex.state[1] | future_hex.state[2] | future_hex.state[3] | future_hex.state[4] | future_hex.state[5]
+        if moving:
             future_hex.occupied = True
             # If it is occupied and moving, blue
             future_hex.color = (0, 0, 255)
             print(str(self.matrix_index) + ", " + str(self.list_index) + " occupied and moving")
-            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to blue")    
         elif future_hex.occupied:
             # If it is occupied and not moving, white
             future_hex.color = (255, 255, 255)
-            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to white")    
+            print(str(self.matrix_index) + ", " + str(self.list_index) + " occupied and stationary")    
         else:
             # If it is not occupied, red
             future_hex.color = (255, 0, 0)
+            print(str(self.matrix_index) + ", " + str(self.list_index) + " not occupied")    
+
 
 def hex_matrix_init():
     matrix = []
