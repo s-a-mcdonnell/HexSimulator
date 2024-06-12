@@ -112,46 +112,60 @@ class Hex:
         future_hex.state = [0,0,0,0,0,0]
 
         if self.list_index - 1 > 0:
-            # If its upper neighbor is a wall and it is moving up and to the right, it will move down and to the right
-            # TODO: Do I need to check if an unmovable object is occupied?
-            # TODO: Add similar statements coping with walls to the conditionals checking the other neighbors (write a function taking advantage of the fact that 2 and 4 are adjacent to 3?)
-            if this_world[self.matrix_index][self.list_index - 1].movable:
-                
-                # Only transfer momentum if the upper right neighbor is not a wall
-                if (self.matrix_index + 1 >= len(this_world)) or (this_world[self.matrix_index + 1][self.list_index - 1].movable):
 
-                    if this_world[self.matrix_index][self.list_index - 1].state[3]:
-                        # If its upper neighbor is pointing down (and is not a wall), it will point down in the future
-
-                        # TODO: Simplify this to future_hex.state[3] = 1
-                        future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
-
-            else:
+            # If the upper neighbor is a wall, reflect off of it
+            if self.upper_neighbor_is_wall():
+                # Coming from the lower left
                 if self.state[1]:
                     future_hex.state[2] = 1
     
+                # Coming from the lower right
                 if self.state[5]:
-                    future_hex.state[4] = 1                
+                    future_hex.state[4] = 1 
+
+                # Head-on collision with wall
+                if self.state[0]:
+                    future_hex.state[3] = 1
+                
+
+            else:
+                # If the upper neighbor is not a wall and is pointing down (state 3), take that state
+                # unless the upper right neighbor (the upper neighbor's lower right neighbor)
+                # or the upper left neighbor (the upper neighbor's lower left neighbor) is a wall
+
+                if (not self.upper_right_neighbor_is_wall) and (not self.upper_left_neighbor_is_wall()):
+
+                    if this_world[self.matrix_index][self.list_index - 1].state[3]:
+                        # If its upper neighbor is pointing down (and is not a wall), it will point down in the future
+                        future_hex.state[3] = 1               
 
         if self.list_index + 1 < len(this_world[self.matrix_index]):
-            # If its lower neighbor is a wall and it is moving down and to the right, it will move up and to the right
-            if not this_world[self.matrix_index][self.list_index + 1].movable:
-                '''print("Unmovable neighbor found")
-                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
-                print("My states are " + str(self.state))'''
+            
+            # If its lower neighbor is a wall, reflect off of it
+            if self.lower_neighbor_is_wall():
+                # Coming from the upper left
                 if self.state[2]:
                     future_hex.state[1] = 1
-                    '''print("reflected 2 to 1")
-                    print("My new states are " + str(future_hex.state))'''
 
+                # Coming from the upper right
                 if self.state[4]:
                     future_hex.state[5] = 1
-                    '''print("reflected 4 to 5")'''
-            elif this_world[self.matrix_index][self.list_index + 1].state[0]:
-                # If its lower neighbor is pointing up, it will point up in the future
+                    
+                    
+                # Coming from above (head-on collision and bounce)
+                if self.state[3]:
+                    future_hex.state[0] = 1
 
-                # TODO: Simplify this to future_hex.state[0] = 1
-                future_hex.state[0] = this_world[self.matrix_index][self.list_index + 1].state[0]
+            else:
+
+                # If the lower neighbor is not a wall and is pointing up (state 0), take that state
+                # unless the lower right neighbor (the lower neighbor's upper right neighbor)
+                # or the lower left neighbor (the lower neighbor's upper left neighbor) is a wall
+
+                if (not self.lower_right_neighbor_is_wall) and (not self.lower_left_neighbor_is_wall()):
+                
+                    if this_world[self.matrix_index][self.list_index + 1].state[0]:
+                        future_hex.state[0] = 1
 
         # If its lower right neighbor is pointing up and left, it will point up and left in the future
         # TODO: Write case for when the lower right neighbor is a wall and it is moving down (state 3 --> state 4)
@@ -160,18 +174,17 @@ class Hex:
             # Unless the upper right neighbor (the upper neighbor of the lower right neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
             # __if (self.list_index - 1 < 0) or (this_world[self.matrix_index + 1][self.list_index - 1].movable):
-            if (self.list_index - 1 < 0) or (this_world[self.matrix_index + 1][self.list_index].movable):
+            if not self.upper_right_neighbor_is_wall():
                 if this_world[self.matrix_index + 1][self.list_index].state[5]:
-                    # __ future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
                     future_hex.state[5] = 1
             else:
                 # TODO: Adjacent wall case
                 print("Reflecting " + str(self.matrix_index) + ", " + str(self.list_index))
-                if self.state[3]:
-                    future_hex.state[4] = 1
-                    print("My new states are " + str(future_hex.state))
                 if self.state[1]:
-                    future_hex.state[0] = 1
+                    future_hex.state[2] = 1
+                    print("My new states are " + str(future_hex.state))
+                if self.state[5]:
+                    future_hex.state[4] = 1
                     print("My new states are " + str(future_hex.state))
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
@@ -179,7 +192,7 @@ class Hex:
         if (self.matrix_index - 1 > 0) and (self.list_index + 1 < len(this_world[self.matrix_index - 1])):
             # Unless the upper left neighbor (the upper neighbor of the lower left neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
-            if this_world[self.matrix_index - 1][self.list_index].movable:
+            if not self.upper_left_neighbor_is_wall():
                 if this_world[self.matrix_index - 1][self.list_index + 1].state[1]:
                     # TODO: simplify
                     # __ future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
@@ -193,7 +206,7 @@ class Hex:
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
         # TODO: Write case for when the upper left neighbor is a wall and it is moving up (state 0 --> state 1)
         if (self.list_index + 1 < len(this_world[self.matrix_index - 1])) and (self.matrix_index - 1 > 0):
-            if this_world[self.matrix_index - 1][self.list_index + 1].movable:
+            if not self.lower_left_neighbor_is_wall():
                 if this_world[self.matrix_index - 1][self.list_index].state[2]:
                     # TODO: simplify
                     future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
@@ -207,11 +220,13 @@ class Hex:
         # TODO: Write case for when the upper right neighbor is a wall and it is moving up (state 0 --> state 5)
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
 
+            # TODO: Make sure these checks aren't a consequence of the [1][13] [1][12] mistake
+
             # Only transfer momentum if the upper right neighbor is not a wall
-            if this_world[self.matrix_index + 1][self.list_index - 1].movable:
+            if not self.upper_right_neighbor_is_wall():
                 
                 # Only transfer momentum if the lower right neighbot (the lower neighbor of the upper right neighbor) is not a wall
-                if this_world[self.matrix_index + 1][self.list_index].movable:
+                if not self.lower_right_neighbor_is_wall():
 
                     # Transfer momentum
                     if this_world[self.matrix_index + 1][self.list_index - 1].state[4]:
