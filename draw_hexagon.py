@@ -65,6 +65,8 @@ class Hex:
         # TODO: Condense these conditionals
 
         future_hex.occupied = False
+        # TODO: Does it make sense to reset states as well?
+        future_hex.state = [0,0,0,0,0,0]
 
         if self.list_index - 1 > 0:
             # If its upper neighbor is pointing down, it will point down in the future
