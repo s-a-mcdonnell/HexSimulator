@@ -112,6 +112,7 @@ class Hex:
                 future_hex.state[0] = this_world[self.matrix_index][self.list_index + 1].state[0]
 
         # If its lower right neighbor is pointing up and left, it will point up and left in the future
+        # TODO: Write case for when the lower right neighbor is a wall and it is moving down (state 3 --> state 4)
         if self.matrix_index + 1 < len(this_world):
             # Unless the upper right neighbor (the upper neighbor of the lower right neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
@@ -121,6 +122,7 @@ class Hex:
                     future_hex.state[5] = 1
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
+        # TODO: Write case for when the lower left neighbor is a wall and it is moving down (state 3 --> state 2)
         if (self.matrix_index - 1 > 0) and (self.list_index + 1 < len(this_world[self.matrix_index - 1])):
             # Unless the upper left neighbor (the upper neighbor of the lower left neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
@@ -136,6 +138,7 @@ class Hex:
 
 
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
+        # TODO: Write case for when the upper left neighbor is a wall and it is moving up (state 0 --> state 1)
         if (self.list_index + 1 < len(this_world[self.matrix_index - 1])) and (self.matrix_index - 1 > 0):
             if this_world[self.matrix_index - 1][self.list_index + 1].movable:
                 if this_world[self.matrix_index - 1][self.list_index].state[2]:
@@ -148,6 +151,7 @@ class Hex:
                     print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
 
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
+        # TODO: Write case for when the upper right neighbor is a wall and it is moving up (state 0 --> state 5)
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
             # Unless the lower right neighbor (the lower neighbor of the upper right neighbor) is a wall
             if this_world[self.matrix_index + 1][self.list_index].movable:
@@ -155,7 +159,7 @@ class Hex:
                     # TODO: Simplify
                     future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
 
-        # TODO: Handle collisions with walls
+        # TODO: Handle head-on collisions with walls
 
 
         # Update occupied boolean and color
