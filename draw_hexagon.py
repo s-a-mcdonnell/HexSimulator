@@ -206,13 +206,30 @@ hex_matrix[4][7].state[3] = 3
 hex_matrix[6][10].movable = True
 hex_matrix[6][10].state[2] = 1'''
 
-# Head-on collision test
-'''hex_matrix[5][6].state[3] = 1
+'''# Head-on collision test (vertical)
+hex_matrix[5][6].state[3] = 1
 hex_matrix[5][11].state[0] = 1'''
 
-# Diagonal collision test
+'''# Head-on collision test (angles 2 and 5)
+hex_matrix[4][7].state[2] = 1
+hex_matrix[8][7].state[5] = 1'''
+
+'''# Head-on collision test (angles 1 and 4)
+hex_matrix[3][10].state[1] = 1
+hex_matrix[7][6].state[4] = 1'''
+
+
+# Diagonal collision test (angles 1 and 2)
 '''hex_matrix[3][7].state[2] = 1
 hex_matrix[3][10].state[1] = 1'''
+
+'''# Diagonal collision test (angles 2 and 3)
+hex_matrix[4][7].state[2] = 1
+hex_matrix[6][5].state[3] = 1'''
+
+# Diagonal collision test (angles 3 and 4)
+hex_matrix[5][5].state[3] = 1
+hex_matrix[8][5].state[4] = 1
 
 # Create second matrix to alternate with
 alt_matrix = hex_matrix_init()
@@ -226,12 +243,12 @@ alt_matrix[5][6].movable = False
 alt_matrix[5][6].occupied = True
 hex_matrix[2][10].state[1] = 1'''
 
-# Adjacent wall bounce test (lower wall)
+'''# Adjacent wall bounce test (lower wall)
 hex_matrix[5][9].movable = False
 hex_matrix[5][9].occupied = True
 alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
-hex_matrix[2][8].state[2] = 1
+hex_matrix[2][8].state[2] = 1'''
 # __ head-on
 # __ hex_matrix[5][11].state[0] = 1
 
