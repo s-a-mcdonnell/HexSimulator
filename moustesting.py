@@ -118,14 +118,21 @@ for x in range(17):
 
 
 # check for a hit box
-def findhex(position):
+def postohex(position):
     print('Mouse button pressed!', position)
-
 
     print('Mouse button pressed!', position[0])
 
+    uum = (position[0]-20,position[1]-35)
+    print('maybe?', uum)
 
+    ummx = (uum[0]+20)/60
+    ummy = (uum[1]+490-(35*ummx))/70
 
+    print('intish?', ummx)
+    print('intish?', ummy)
+
+    hex_matrix[round(ummx)][round(ummy)].state[0] = 1
 
 #########################################################
 
@@ -150,7 +157,7 @@ while run:
             run = False
 
     if event.type == pygame.MOUSEBUTTONDOWN:
-        findhex(pygame.mouse.get_pos())
+        postohex(pygame.mouse.get_pos())
     # flip() the display to put your work on screen
 
     pygame.display.flip()
