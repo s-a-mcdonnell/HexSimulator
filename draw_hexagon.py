@@ -85,7 +85,7 @@ class Hex:
                     future_hex.state[4] = 1
                     print("reflected 5 to 4")
             elif this_world[self.matrix_index][self.list_index - 1].state[3]:
-                # If its upper neighbor is pointing down, it will point down in the future
+                # If its upper neighbor is pointing down (and is not a wall), it will point down in the future
 
                 # TODO: Simplify this to future_hex.state[3] = 1
                 future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
@@ -120,6 +120,12 @@ class Hex:
                 if this_world[self.matrix_index + 1][self.list_index].state[5]:
                     # __ future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
                     future_hex.state[5] = 1
+            else:
+                # TODO: Adjacent wall case
+                if self.state[3]:
+                    future_hex.state[4] = 1
+                if self.state[1]:
+                    future_hex.state[0] = 1
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
         # TODO: Write case for when the lower left neighbor is a wall and it is moving down (state 3 --> state 2)
