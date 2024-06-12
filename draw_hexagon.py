@@ -119,15 +119,17 @@ class Hex:
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
         if (self.matrix_index - 1 > 0) and (self.list_index + 1 < len(this_world[self.matrix_index - 1])):
-            # __ unless the upper left neighbor (the upper neighbor of the lower left neighbor) is a wall
+            # Unless the upper left neighbor (the upper neighbor of the lower left neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
-            if this_world[self.matrix_index - 1][self.list_index + 1].movable:
+            if this_world[self.matrix_index - 1][self.list_index].movable:
                 if this_world[self.matrix_index - 1][self.list_index + 1].state[1]:
                     # TODO: simplify
-                    future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
+                    # __ future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
+                    future_hex.state[1] = 1
             else:
-                print("No transfer of momentum due to adjacent wall")
-                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
+                if this_world[self.matrix_index - 1][self.list_index + 1].state[1]:
+                    print("No transfer of momentum due to adjacent wall")
+                    print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
 
 
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
@@ -138,9 +140,9 @@ class Hex:
                     future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
             else:
                 # TODO: Explain exception for the adjacent wall
-
-                print("No transfer of momentum due to adjacent wall")
-                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
+                if this_world[self.matrix_index - 1][self.list_index].state[2]:
+                    print("No transfer of momentum due to adjacent wall")
+                    print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
 
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
@@ -227,23 +229,23 @@ hex_matrix[3][10].state[1] = 1'''
 hex_matrix[4][7].state[2] = 1
 hex_matrix[6][5].state[3] = 1'''
 
-# Diagonal collision test (angles 3 and 4)
+'''# Diagonal collision test (angles 3 and 4)
 hex_matrix[5][5].state[3] = 1
-hex_matrix[8][5].state[4] = 1
+hex_matrix[8][5].state[4] = 1'''
 
 # Create second matrix to alternate with
 alt_matrix = hex_matrix_init()
 
 # TODO: If there are any unmovable hexes, copy them over
 
-'''# Adjacent wall bounce test (upper wall)
+# Adjacent wall bounce test (upper wall from the left)
 hex_matrix[5][6].movable = False
 hex_matrix[5][6].occupied = True
 alt_matrix[5][6].movable = False
 alt_matrix[5][6].occupied = True
-hex_matrix[2][10].state[1] = 1'''
+hex_matrix[2][10].state[1] = 1
 
-'''# Adjacent wall bounce test (lower wall)
+'''# Adjacent wall bounce test (lower wall from the left)
 hex_matrix[5][9].movable = False
 hex_matrix[5][9].occupied = True
 alt_matrix[5][9].movable = False
