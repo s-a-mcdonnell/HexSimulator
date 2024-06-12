@@ -77,13 +77,14 @@ class Hex:
                 print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
                 print("My states are " + str(self.state))
                 if self.state[1]:
-                    # TODO: Seems dangerous to edit current array, and this only protects when I read in a certain order, anyway
-                    self.state[1] = 0
                     future_hex.state[2] = 1
+                    print("reflected 1 to 2")
+                    print("My new states are " + str(future_hex.state))
+
                 if self.state[5]:
-                    # TODO: Seems dangerous to edit current array
-                    self.state[5] = 0
                     future_hex.state[4] = 1
+                    print("reflected 5 to 4")
+
 
         # If its lower neighbor is pointing up, it will point up in the future
         if self.list_index + 1 < len(this_world[self.matrix_index]):
@@ -95,7 +96,15 @@ class Hex:
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
         if (self.matrix_index - 1 > 0) and (self.list_index + 1 < len(this_world[self.matrix_index - 1])):
-            future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
+            # __ unless the upper left neighbor (the upper neighbor of the lower left neighbor) is a wall
+            # TODO: Check this exception for the adjacent wall
+            if this_world[self.matrix_index - 1][self.list_index].movable:
+                future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
+            else:
+                print("No transfer of momentum due to adjacent wall")
+                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
+
+
 
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
         if self.matrix_index - 1 > 0:
@@ -113,6 +122,7 @@ class Hex:
             future_hex.occupied = True
             # If it is occupied and moving, blue
             future_hex.color = (0, 0, 255)
+            print(str(self.matrix_index) + ", " + str(self.list_index) + " occupied and moving")
             # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " switched to blue")    
         elif future_hex.occupied:
             # If it is occupied and not moving, white
