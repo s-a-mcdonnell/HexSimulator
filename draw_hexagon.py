@@ -72,39 +72,38 @@ class Hex:
             # If its upper neighbor is a wall and it is moving up and to the right, it will move down and to the right
             # TODO: Do I need to check if an unmovable object is occupied?
             # TODO: Add similar statements coping with walls to the conditionals checking the other neighbors (write a function taking advantage of the fact that 2 and 4 are adjacent to 3?)
-            if not this_world[self.matrix_index][self.list_index - 1].movable:
-                print("Unmovable neighbor found")
-                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
-                print("My states are " + str(self.state))
+            if this_world[self.matrix_index][self.list_index - 1].movable:
+                
+                # Only transfer momentum if the upper right neighbor is not a wall
+                if (self.matrix_index + 1 >= len(this_world)) or (this_world[self.matrix_index + 1][self.list_index - 1].movable):
+
+                    if this_world[self.matrix_index][self.list_index - 1].state[3]:
+                        # If its upper neighbor is pointing down (and is not a wall), it will point down in the future
+
+                        # TODO: Simplify this to future_hex.state[3] = 1
+                        future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
+
+            else:
                 if self.state[1]:
                     future_hex.state[2] = 1
-                    print("reflected 1 to 2")
-                    print("My new states are " + str(future_hex.state))
-
+    
                 if self.state[5]:
-                    future_hex.state[4] = 1
-                    print("reflected 5 to 4")
-            elif this_world[self.matrix_index][self.list_index - 1].state[3]:
-                # If its upper neighbor is pointing down (and is not a wall), it will point down in the future
-
-                # TODO: Simplify this to future_hex.state[3] = 1
-                future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
-
+                    future_hex.state[4] = 1                
 
         if self.list_index + 1 < len(this_world[self.matrix_index]):
             # If its lower neighbor is a wall and it is moving down and to the right, it will move up and to the right
             if not this_world[self.matrix_index][self.list_index + 1].movable:
-                print("Unmovable neighbor found")
+                '''print("Unmovable neighbor found")
                 print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
-                print("My states are " + str(self.state))
+                print("My states are " + str(self.state))'''
                 if self.state[2]:
                     future_hex.state[1] = 1
-                    print("reflected 2 to 1")
-                    print("My new states are " + str(future_hex.state))
+                    '''print("reflected 2 to 1")
+                    print("My new states are " + str(future_hex.state))'''
 
                 if self.state[4]:
                     future_hex.state[5] = 1
-                    print("reflected 4 to 5")
+                    '''print("reflected 4 to 5")'''
             elif this_world[self.matrix_index][self.list_index + 1].state[0]:
                 # If its lower neighbor is pointing up, it will point up in the future
 
@@ -116,16 +115,20 @@ class Hex:
         if self.matrix_index + 1 < len(this_world):
             # Unless the upper right neighbor (the upper neighbor of the lower right neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
-            if (self.list_index - 1 < 0) or (this_world[self.matrix_index + 1][self.list_index - 1].movable):
+            # __if (self.list_index - 1 < 0) or (this_world[self.matrix_index + 1][self.list_index - 1].movable):
+            if (self.list_index - 1 < 0) or (this_world[self.matrix_index + 1][self.list_index].movable):
                 if this_world[self.matrix_index + 1][self.list_index].state[5]:
                     # __ future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
                     future_hex.state[5] = 1
             else:
                 # TODO: Adjacent wall case
+                print("Reflecting " + str(self.matrix_index) + ", " + str(self.list_index))
                 if self.state[3]:
                     future_hex.state[4] = 1
+                    print("My new states are " + str(future_hex.state))
                 if self.state[1]:
                     future_hex.state[0] = 1
+                    print("My new states are " + str(future_hex.state))
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
         # TODO: Write case for when the lower left neighbor is a wall and it is moving down (state 3 --> state 2)
@@ -159,11 +162,29 @@ class Hex:
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
         # TODO: Write case for when the upper right neighbor is a wall and it is moving up (state 0 --> state 5)
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
-            # Unless the lower right neighbor (the lower neighbor of the upper right neighbor) is a wall
-            if this_world[self.matrix_index + 1][self.list_index].movable:
+
+            # Only transfer momentum if the upper right neighbor is not a wall
+            if this_world[self.matrix_index + 1][self.list_index - 1].movable:
+                
+                # Only transfer momentum if the lower right neighbot (the lower neighbor of the upper right neighbor) is not a wall
+                if this_world[self.matrix_index + 1][self.list_index].movable:
+
+                    # Transfer momentum
+                    if this_world[self.matrix_index + 1][self.list_index - 1].state[4]:
+                        future_hex.state[4] = 1
+            else:
+                # If the upper right neighbor is a wall, bounce off of it
+                if self.state[1]:
+                    future_hex.state[0] = 1
+                    print("My new states are " + str(future_hex.state))
+                '''if self.state[1]:
+                    future_hex.state[0] = 1
+                    print("My new states are " + str(future_hex.state))'''
+
+            '''if this_world[self.matrix_index + 1][self.list_index].movable:
                 if this_world[self.matrix_index + 1][self.list_index - 1].state[4]:
                     # TODO: Simplify
-                    future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
+                    future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]'''
 
         # TODO: Handle head-on collisions with walls
 
@@ -287,6 +308,13 @@ hex_matrix[5][9].occupied = True
 alt_matrix[5][9].movable = False
 alt_matrix[5][8].occupied = True
 hex_matrix[4][5].state[3] = 1
+
+'''# Adjacent wall bounce test (right wall from lower left)
+hex_matrix[5][9].movable = False
+hex_matrix[5][9].occupied = True
+alt_matrix[5][9].movable = False
+alt_matrix[5][8].occupied = True
+hex_matrix[1][13].state[1] = 1'''
 # __ head-on
 # __ hex_matrix[5][11].state[0] = 1
 
