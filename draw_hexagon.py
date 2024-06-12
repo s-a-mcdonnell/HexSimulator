@@ -69,8 +69,6 @@ class Hex:
         future_hex.state = [0,0,0,0,0,0]
 
         if self.list_index - 1 > 0:
-            # If its upper neighbor is pointing down, it will point down in the future
-            future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
             # If its upper neighbor is a wall and it is moving up and to the right, it will move down and to the right
             # TODO: Do I need to check if an unmovable object is occupied?
             # TODO: Add similar statements coping with walls to the conditionals checking the other neighbors (write a function taking advantage of the fact that 2 and 4 are adjacent to 3?)
@@ -86,36 +84,69 @@ class Hex:
                 if self.state[5]:
                     future_hex.state[4] = 1
                     print("reflected 5 to 4")
+            elif this_world[self.matrix_index][self.list_index - 1].state[3]:
+                # If its upper neighbor is pointing down, it will point down in the future
+
+                # TODO: Simplify this to future_hex.state[3] = 1
+                future_hex.state[3] = this_world[self.matrix_index][self.list_index - 1].state[3]
 
 
-        # If its lower neighbor is pointing up, it will point up in the future
         if self.list_index + 1 < len(this_world[self.matrix_index]):
-            future_hex.state[0] = this_world[self.matrix_index][self.list_index + 1].state[0]
+            # If its lower neighbor is a wall and it is moving down and to the right, it will move up and to the right
+            if not this_world[self.matrix_index][self.list_index + 1].movable:
+                print("Unmovable neighbor found")
+                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
+                print("My states are " + str(self.state))
+                if self.state[2]:
+                    future_hex.state[1] = 1
+                    print("reflected 2 to 1")
+                    print("My new states are " + str(future_hex.state))
+
+                if self.state[4]:
+                    future_hex.state[5] = 1
+                    print("reflected 4 to 5")
+            elif this_world[self.matrix_index][self.list_index + 1].state[0]:
+                # If its lower neighbor is pointing up, it will point up in the future
+
+                # TODO: Simplify this to future_hex.state[0] = 1
+                future_hex.state[0] = this_world[self.matrix_index][self.list_index + 1].state[0]
 
         # If its lower right neighbor is pointing up and left, it will point up and left in the future
         if self.matrix_index + 1 < len(this_world):
-            future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
+            # TODO: Simplify this to __
+            if this_world[self.matrix_index + 1][self.list_index].state[5]:
+                future_hex.state[5] = this_world[self.matrix_index + 1][self.list_index].state[5]
 
         # If its lower left neighbor is pointing up and right, it will point up and right in the future
         if (self.matrix_index - 1 > 0) and (self.list_index + 1 < len(this_world[self.matrix_index - 1])):
             # __ unless the upper left neighbor (the upper neighbor of the lower left neighbor) is a wall
             # TODO: Check this exception for the adjacent wall
-            if this_world[self.matrix_index - 1][self.list_index].movable:
-                future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
+            if this_world[self.matrix_index - 1][self.list_index + 1].movable:
+                if this_world[self.matrix_index - 1][self.list_index + 1].state[1]:
+                    # TODO: simplify
+                    future_hex.state[1] = this_world[self.matrix_index - 1][self.list_index + 1].state[1]
             else:
                 print("No transfer of momentum due to adjacent wall")
                 print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
 
 
-        # TODO: Reactivate this: I think it might be messing with the wall bounce case, but it is necessary
         # If its upper left neighbor is pointing down and right, it will point down and right in the future
-        if self.matrix_index - 1 > 0:
-            if this_world[self.matrix_index - 1][self.list_index].state[2]:
-                future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
+        if (self.list_index + 1 < len(this_world[self.matrix_index - 1])) and (self.matrix_index - 1 > 0):
+            if this_world[self.matrix_index - 1][self.list_index + 1].movable:
+                if this_world[self.matrix_index - 1][self.list_index].state[2]:
+                    # TODO: simplify
+                    future_hex.state[2] = this_world[self.matrix_index - 1][self.list_index].state[2]
+            else:
+                # TODO: Explain exception for the adjacent wall
+
+                print("No transfer of momentum due to adjacent wall")
+                print("I am " + str(self.matrix_index) + ", " + str(self.list_index))
 
         # If its upper right neighbor is pointing down and left, it will point down and left in the future
         if (self.matrix_index + 1 < len(this_world)) and (self.list_index - 1 > 0):
-            future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
+            if this_world[self.matrix_index + 1][self.list_index - 1].state[4]:
+                # TODO: Simplify
+                future_hex.state[4] = this_world[self.matrix_index + 1][self.list_index - 1].state[4]
 
         # TODO: Handle collisions with walls
 
@@ -134,7 +165,7 @@ class Hex:
         else:
             # If it is not occupied, red
             future_hex.color = (255, 0, 0)
-            print(str(self.matrix_index) + ", " + str(self.list_index) + " not occupied")    
+            # __ print(str(self.matrix_index) + ", " + str(self.list_index) + " not occupied")    
 
 
 def hex_matrix_init():
@@ -188,12 +219,19 @@ alt_matrix = hex_matrix_init()
 
 # TODO: If there are any unmovable hexes, copy them over
 
-# Adjacent wall bounce
+'''# Adjacent wall bounce test (upper wall)
 hex_matrix[5][6].movable = False
 hex_matrix[5][6].occupied = True
 alt_matrix[5][6].movable = False
 alt_matrix[5][6].occupied = True
-hex_matrix[2][10].state[1] = 1
+hex_matrix[2][10].state[1] = 1'''
+
+# Adjacent wall bounce test (lower wall)
+hex_matrix[5][9].movable = False
+hex_matrix[5][9].occupied = True
+alt_matrix[5][9].movable = False
+alt_matrix[5][8].occupied = True
+hex_matrix[2][8].state[2] = 1
 # __ head-on
 # __ hex_matrix[5][11].state[0] = 1
 
