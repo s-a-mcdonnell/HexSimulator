@@ -1,5 +1,7 @@
 import time
 import copy
+import pygame
+
 
 class Hex:
    @staticmethod
@@ -11,9 +13,12 @@ class Hex:
     # Constructor
     # color is an optional parameter with a default value of red
     # moveable is an optional parameter with a default value of true
-   def __init__(self, matrix_index, list_index, color=(255, 0, 0), moveable=True, occupied=False):
+   def __init__(self, matrix_index, list_index, myWorld, color=(255, 0, 0), moveable=True, occupied=False):
        self.matrix_index = matrix_index
        self.list_index = list_index
+
+        # The world that this Hex belongs to
+       self.world = myWorld
 
        self.x = 60*matrix_index - 20
        self.y = 35*matrix_index + 70*list_index - 490
@@ -73,6 +78,8 @@ class Hex:
         # Initializing hexToCheck with default value (reducing repeated memory allocation and deallocation)
         hexToCheck = self
 
+        hex_matrix = self.world.hex_matrix
+
         # check upper hex (pos 0)
         # If the upper hex exists and is occupied, moving, and stationary, flip the boolean in the array
         if self.list_index - 1 >= 0:
@@ -90,12 +97,12 @@ class Hex:
             hex_movable[2] = hexToCheck.check_movable_hex()
 
         # check down hex (pos 3)
-        if self.list_index + 1 < len(hex_list):
+        if self.list_index + 1 < len(hex_matrix[self.matrix_index]):
             hexToCheck = hex_matrix[self.matrix_index][self.list_index + 1]
             hex_movable[3] = hexToCheck.check_movable_hex()
 
         # check southwest hex (pos 4)
-        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_list)):
+        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_matrix[self.matrix_index])):
             hexToCheck = hex_matrix[self.matrix_index - 1][self.list_index + 1]
             hex_movable[4] = hexToCheck.check_movable_hex()
 
@@ -117,6 +124,8 @@ class Hex:
         # Default value of hexToCheck (not used)
         hexToCheck = self
 
+        hex_matrix = self.world.hex_matrix
+
         # check upper hex (pos 0)
         if self.list_index - 1 >= 0:
            hexToCheck = hex_matrix[self.matrix_index][self.list_index - 1]
@@ -135,13 +144,13 @@ class Hex:
 
 
         # check down hex (pos 3)
-        if self.list_index + 1 < len(hex_list):
+        if self.list_index + 1 < len(hex_matrix[self.matrix_index]):
             hexToCheck = hex_matrix[self.matrix_index][self.list_index + 1]
             hex_walls[3] = hexToCheck.check_wall_hex()
 
 
         # check southwest hex (pos 4)
-        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_list)):
+        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_matrix[self.matrix_index])):
             hexToCheck = hex_matrix[self.matrix_index - 1][self.list_index + 1]
             hex_walls[4] = hexToCheck.check_wall_hex()
 
@@ -196,7 +205,9 @@ class Hex:
    #update self hexagon
    def update(self):
         # determine the state of the current hex based on the states of the hexes around it
-        future = hex_matrix_new[self.matrix_index][self.list_index]
+        future = self.world.hex_matrix_new[self.matrix_index][self.list_index]
+
+        hex_matrix = self.world.hex_matrix
 
         # TODO: Make state 7 elements long?
         future.state = [0, 0, 0, 0, 0, 0]
@@ -225,7 +236,7 @@ class Hex:
 
 
             # DOWN NEIGHBOR EFFECTS (3)
-            if self.list_index + 1 < len(hex_list):
+            if self.list_index + 1 < len(hex_matrix[self.matrix_index]):
                 # Call motion_handler, passing lower neighbor
                 self.motion_handler(future, hex_matrix[self.matrix_index][self.list_index + 1], neighbors_movable, neighbors_wall, 3)
     
@@ -248,157 +259,150 @@ class Hex:
 
 
             # SOUTHWEST NEIGHBOR (4)
-            if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_list)):
+            if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_matrix[self.matrix_index])):
                 # Call motion_handler, passing southwests neighbor
                 self.motion_handler(future, hex_matrix[self.matrix_index - 1][self.list_index + 1], neighbors_movable, neighbors_wall, 4)
 
+class World:
 
-import pygame
+    def __init__(self):
 
-pygame.init()
+        pygame.init()
 
-SCREEN_WIDTH = 800
+        SCREEN_WIDTH = 800
 
-SCREEN_HEIGHT = 600
+        SCREEN_HEIGHT = 600
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Draw Hexagon")
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption("Draw Hexagon")
 
-# set up pygame timer
-clock = pygame.time.Clock()
-run = True
-dt = 0
+        # set up pygame timer
+        self.clock = pygame.time.Clock()
+        self.run = True
+        self.dt = 0
 
-# Create hexagons
-hex_matrix = []
+        # Create hexagons
+        self.hex_matrix = []
 
-for x in range(15):
-    hex_list = []
-    hex_matrix.append(hex_list)
+        for x in range(15):
+            hex_list = []
+            self.hex_matrix.append(hex_list)
 
-    for y in range(16):
-        myHex = Hex(x, y)
-        hex_list.append(myHex)
+            for y in range(16):
+                myHex = Hex(x, y, self)
+                hex_list.append(myHex)
 
-# create additional matrix
-hex_matrix_new = []
+        # create additional matrix
+        self.hex_matrix_new = []
 
-for x in range(15):
-    hex_list_new = []
-    hex_matrix_new.append(hex_list_new)
+        for x in range(15):
+            hex_list_new = []
+            self.hex_matrix_new.append(hex_list_new)
 
-    for y in range(16):
-        myHex = Hex(x, y)
-        hex_list_new.append(myHex)
-
-# Update the state of a few hexagons to reflect motion (test cases)
-#hex_matrix[10][8].occupied = True
-hex_matrix[10][4].occupied = True
-# hex_matrix[4][7].occupied = True
-# hex_matrix[6][10].occupied = True
-# hex_matrix[3][5].occupied = True
-#hex_matrix[4][6].occupied = True
-
-hex_matrix[10][8].make_move(5)
-#hex_matrix[4][6].make_move(3)
-#hex_matrix[9][6].make_move(4)
-hex_matrix[2][8].make_move(5)
-
-hex_matrix[7][7].make_move(3)
-hex_matrix[7][6].make_move(3)
-
-#hex_matrix[6][6].make_wall()
-#hex_matrix[5][9].make_wall()
-#hex_matrix[6][7].make_wall()
-hex_matrix[7][9].make_wall()
-hex_matrix[7][8].make_wall()
-
-# Create walls around the edges
-# Left edge
-for hex in hex_matrix[0]:
-    hex.make_wall()
-# Right edge
-for hex in hex_matrix[13]:
-    hex.make_wall()
-for i in range(6):
-    # Top edge
-    hex_matrix[1+2*i][6-i].make_wall()
-    hex_matrix[2+2*i][6-i].make_wall()
-
-    # Bottom edge
-    hex_matrix[1+2*i][15-i].make_wall()
-    hex_matrix[2+2*i][14-i].make_wall()
-
-run = True
-while run:
-
-    # Reset screen
-    screen.fill((0, 0, 0))
-
-    # Draw hexagons
-    r = 10
-    g = 10
-    b = 10
-
-    for hex_list in hex_matrix:
-        for hexagon in hex_list:
-            hexagon.draw(screen)
+            for y in range(16):
+                myHex = Hex(x, y, self)
+                hex_list_new.append(myHex)
         
-            # polygon rotation tips from: https://stackoverflow.com/questions/75116101/how-to-make-rotate-polygon-on-key-in-pygame
+        
+        # Create walls around the edges
+        # Left edge
+        for hex in self.hex_matrix[0]:
+            hex.make_wall()
+        # Right edge
+        for hex in self.hex_matrix[13]:
+            hex.make_wall()
+        for i in range(6):
+            # Top edge
+            self.hex_matrix[1+2*i][6-i].make_wall()
+            self.hex_matrix[2+2*i][6-i].make_wall()
 
-            # draw an arrow on the hex if the hex is moving
-            if (hexagon.is_moving):
-                #pivot is the center of the hexagon
-                pivot = pygame.Vector2(hexagon.x + 20, hexagon.y + 35)
-                # set of arrow points should be the vectors from the pivot to the edge points of the arrow
-                arrow = [(0, -15), (10, -5), (5, -5), (5, 15), (-5, 15), (-5, -5), (-10, -5)]
-                # get arrow by adding all the vectors to the pivot point => allows for easy rotation
+            # Bottom edge
+            self.hex_matrix[1+2*i][15-i].make_wall()
+            self.hex_matrix[2+2*i][14-i].make_wall()
+        
+        '''# Update the state of a few hexagons to reflect motion (test cases)
+        self.hex_matrix[10][4].occupied = True
 
-                if(hexagon.state[0] != 0):
-                    arrow_new = [(pygame.math.Vector2(x, y)) + pivot for x, y in arrow]
-                    pygame.draw.polygon(screen, (0, 0, 0), arrow_new)
+        self.hex_matrix[10][8].make_move(5)
+        self.hex_matrix[2][8].make_move(5)
 
-                if(hexagon.state[1] != 0):
-                    arrow_new = [(pygame.math.Vector2(x, y)).rotate(60.0) + pivot for x, y in arrow]
-                    pygame.draw.polygon(screen, (0, 0, 0), arrow_new)
+        self.hex_matrix[7][7].make_move(3)
+        self.hex_matrix[7][6].make_move(3)
 
-                if(hexagon.state[2] != 0):
-                    arrow_new = [(pygame.math.Vector2(x, y)).rotate(120.0) + pivot for x, y in arrow]
-                    pygame.draw.polygon(screen, (0, 0, 0), arrow_new)
+        self.hex_matrix[7][9].make_wall()
+        self.hex_matrix[7][8].make_wall()'''
 
-                if(hexagon.state[3] != 0):
-                    arrow_new = [(pygame.math.Vector2(x, y)).rotate(180.0) + pivot for x, y in arrow]
-                    pygame.draw.polygon(screen, (0, 0, 0), arrow_new)
+    def run_simulation(self):
+        run = True
+        while run:
 
-                if(hexagon.state[4] != 0):
-                    arrow_new = [(pygame.math.Vector2(x, y)).rotate(240.0) + pivot for x, y in arrow]
-                    pygame.draw.polygon(screen, (0, 0, 0), arrow_new)
+            # Reset screen
+            self.screen.fill((0, 0, 0))
 
-                if(hexagon.state[5] != 0):
-                    arrow_new = [(pygame.math.Vector2(x, y)).rotate(300.0) + pivot for x, y in arrow]
-                    pygame.draw.polygon(screen, (0, 0, 0), arrow_new)
+            # Draw hexagons
+    
+            for hex_list in self.hex_matrix:
+                for hexagon in hex_list:
+                    hexagon.draw(self.screen)
+                
+                    # polygon rotation tips from: https://stackoverflow.com/questions/75116101/how-to-make-rotate-polygon-on-key-in-pygame
+
+                    # draw an arrow on the hex if the hex is moving
+                    if (hexagon.is_moving):
+                        #pivot is the center of the hexagon
+                        pivot = pygame.Vector2(hexagon.x + 20, hexagon.y + 35)
+                        # set of arrow points should be the vectors from the pivot to the edge points of the arrow
+                        arrow = [(0, -15), (10, -5), (5, -5), (5, 15), (-5, 15), (-5, -5), (-10, -5)]
+                        # get arrow by adding all the vectors to the pivot point => allows for easy rotation
+
+                        if(hexagon.state[0] != 0):
+                            arrow_new = [(pygame.math.Vector2(x, y)) + pivot for x, y in arrow]
+                            pygame.draw.polygon(self.screen, (0, 0, 0), arrow_new)
+
+                        if(hexagon.state[1] != 0):
+                            arrow_new = [(pygame.math.Vector2(x, y)).rotate(60.0) + pivot for x, y in arrow]
+                            pygame.draw.polygon(self.screen, (0, 0, 0), arrow_new)
+
+                        if(hexagon.state[2] != 0):
+                            arrow_new = [(pygame.math.Vector2(x, y)).rotate(120.0) + pivot for x, y in arrow]
+                            pygame.draw.polygon(self.screen, (0, 0, 0), arrow_new)
+
+                        if(hexagon.state[3] != 0):
+                            arrow_new = [(pygame.math.Vector2(x, y)).rotate(180.0) + pivot for x, y in arrow]
+                            pygame.draw.polygon(self.screen, (0, 0, 0), arrow_new)
+
+                        if(hexagon.state[4] != 0):
+                            arrow_new = [(pygame.math.Vector2(x, y)).rotate(240.0) + pivot for x, y in arrow]
+                            pygame.draw.polygon(self.screen, (0, 0, 0), arrow_new)
+
+                        if(hexagon.state[5] != 0):
+                            arrow_new = [(pygame.math.Vector2(x, y)).rotate(300.0) + pivot for x, y in arrow]
+                            pygame.draw.polygon(self.screen, (0, 0, 0), arrow_new)
 
 
-    # Event handler (closing window)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+            # Event handler (closing window)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
 
-    # flips to the next frame
-    pygame.display.flip()
+            # flips to the next frame
+            pygame.display.flip()
 
-    # sets animation to n frames per second where n is inside the parentheses (feel free to change)
-    dt = clock.tick(2) / 1000
+            # sets animation to n frames per second where n is inside the parentheses (feel free to change)
+            dt = self.clock.tick(2) / 1000
 
-    for hex_list in hex_matrix:
-        for hexagon in hex_list:
-            hexagon.update()
+            for hex_list in self.hex_matrix:
+                for hexagon in hex_list:
+                    hexagon.update()
 
-    # need to use the python deepcopy in order to copy the inner lists of a 2D array
-    hex_matrix = copy.deepcopy(hex_matrix_new)
-    # hex_matrix = hex_matrix_new.copy()
+            # need to use the python deepcopy in order to copy the inner lists of a 2D array
+            # TODO: Settle on copying style
+            # self.hex_matrix = copy.deepcopy(self.hex_matrix_new)
+            for i in range(len(self.hex_matrix_new)):
+                for j in range(len(self.hex_matrix_new[i])):
+                    self.hex_matrix[i][j] = self.hex_matrix_new[i][j]
 
-pygame.quit()
+            # hex_matrix = hex_matrix_new.copy()
 
-## making sure I remember how to commit
+        pygame.quit()
 
