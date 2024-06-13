@@ -209,7 +209,7 @@ while run:
         print('key:', keys)
         if keys[pygame.K_w] & on == False:
             on = True
-        elif keys[pygame.K_w] & on =w= True:
+        elif keys[pygame.K_w] & on == True:
             on = False
 
     if on:
