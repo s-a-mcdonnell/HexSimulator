@@ -79,6 +79,7 @@ class Hex:
         hexToCheck = self
 
         hex_matrix = self.world.hex_matrix
+        hex_list = hex_matrix[self.matrix_index]
 
         # check upper hex (pos 0)
         # If the upper hex exists and is occupied, moving, and stationary, flip the boolean in the array
@@ -97,12 +98,12 @@ class Hex:
             hex_movable[2] = hexToCheck.check_movable_hex()
 
         # check down hex (pos 3)
-        if self.list_index + 1 < len(hex_matrix[self.matrix_index]):
+        if self.list_index + 1 < len(hex_list):
             hexToCheck = hex_matrix[self.matrix_index][self.list_index + 1]
             hex_movable[3] = hexToCheck.check_movable_hex()
 
         # check southwest hex (pos 4)
-        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_matrix[self.matrix_index])):
+        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_list)):
             hexToCheck = hex_matrix[self.matrix_index - 1][self.list_index + 1]
             hex_movable[4] = hexToCheck.check_movable_hex()
 
@@ -125,6 +126,7 @@ class Hex:
         hexToCheck = self
 
         hex_matrix = self.world.hex_matrix
+        hex_list = hex_matrix[self.matrix_index]
 
         # check upper hex (pos 0)
         if self.list_index - 1 >= 0:
@@ -144,13 +146,13 @@ class Hex:
 
 
         # check down hex (pos 3)
-        if self.list_index + 1 < len(hex_matrix[self.matrix_index]):
+        if self.list_index + 1 < len(hex_list):
             hexToCheck = hex_matrix[self.matrix_index][self.list_index + 1]
             hex_walls[3] = hexToCheck.check_wall_hex()
 
 
         # check southwest hex (pos 4)
-        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_matrix[self.matrix_index])):
+        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_list)):
             hexToCheck = hex_matrix[self.matrix_index - 1][self.list_index + 1]
             hex_walls[4] = hexToCheck.check_wall_hex()
 
@@ -208,6 +210,7 @@ class Hex:
         future = self.world.hex_matrix_new[self.matrix_index][self.list_index]
 
         hex_matrix = self.world.hex_matrix
+        hex_list = hex_matrix[self.matrix_index]
 
         # TODO: Make state 7 elements long?
         future.state = [0, 0, 0, 0, 0, 0]
@@ -236,7 +239,7 @@ class Hex:
 
 
             # DOWN NEIGHBOR EFFECTS (3)
-            if self.list_index + 1 < len(hex_matrix[self.matrix_index]):
+            if self.list_index + 1 < len(hex_list):
                 # Call motion_handler, passing lower neighbor
                 self.motion_handler(future, hex_matrix[self.matrix_index][self.list_index + 1], neighbors_movable, neighbors_wall, 3)
     
@@ -259,7 +262,7 @@ class Hex:
 
 
             # SOUTHWEST NEIGHBOR (4)
-            if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_matrix[self.matrix_index])):
+            if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_list)):
                 # Call motion_handler, passing southwests neighbor
                 self.motion_handler(future, hex_matrix[self.matrix_index - 1][self.list_index + 1], neighbors_movable, neighbors_wall, 4)
 
@@ -278,7 +281,7 @@ class World:
 
         # set up pygame timer
         self.clock = pygame.time.Clock()
-        self.run = True
+        #self.run = True
         self.dt = 0
 
         # Create hexagons
