@@ -1,3 +1,5 @@
+# Version 2000
+
 import numpy as np
 col1 = (120, 0, 120)
 col2 = (0, 150, 150)
@@ -111,6 +113,29 @@ pygame.display.set_caption("Draw Hexagon")
 
 
 
+# check for a hit box
+def postohex(position):
+    print('Mouse button pressed!', position)
+
+    print('Mouse button pressed!', position[0])
+
+    uum = (position[0]-20,position[1]-35)
+    print('maybe?', uum)
+
+    ummx = (uum[0]+20)/60
+    ummy = (uum[1]+490-(35*ummx))/70
+
+    print('intish?', ummx)
+    print('intish?', ummy)
+
+    hex_matrix[round(ummx)][round(ummy)].state[0] = 1
+
+#########################################################
+clock = pygame.time.Clock()
+run = True
+dt = 0
+
+
 
 # Create hexagons
 hex_matrix = []
@@ -150,14 +175,16 @@ while run:
                 pygame.draw.polygon(screen, col3, hexagon.coordinates)
             else:
                 hexagon.draw(screen)
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-         
 
-
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        postohex(pygame.mouse.get_pos())
+    
     pygame.display.update()
-
+       
 pygame.quit()
 
 ## making sure I remember how to commit
