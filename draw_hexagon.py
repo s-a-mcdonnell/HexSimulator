@@ -169,18 +169,18 @@ class Hex:
         if (neighbors_wall[dir] == 1) or ((neighbors_wall[(dir-1)%6] == 1) and (neighbors_wall[(dir+1)%6] == 1)):
             future.occupied = True
             future.movable = True
-            future.state[dir] = 0
+            #future.state[dir] = 0
             future.state[(dir+3)%6] = 1
         # cases for individual side glancing walls
         elif (neighbors_wall[(dir-1)%6] == 1):
             future.occupied = True
             future.movable = True
-            future.state[dir] = 0
+            #future.state[dir] = 0
             future.state[(dir+1)%6] = 1
         elif (neighbors_wall[(dir+1)%6] == 1):
             future.occupied = True
             future.movable = True
-            future.state[dir] = 0
+            #future.state[dir] = 0
             future.state[(dir-1)%6] = 1
         # if I am moving toward my neighbor, and my neighbor is occupied but not moving, then I become occupied but not moving
         # TODO: Discuss order in which rules are applied
