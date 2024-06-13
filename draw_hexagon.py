@@ -1,6 +1,7 @@
 import time
 import copy
 
+ident_list = []
 class Hex:
    @staticmethod
    def create_coor(x, y):
@@ -11,10 +12,11 @@ class Hex:
     # Constructor
     # color is an optional parameter with a default value of red
     # moveable is an optional parameter with a default value of true
-   def __init__(self, matrix_index, list_index, color=(255, 0, 0), moveable=True, occupied=False):
+   def __init__(self, matrix_index, list_index, color=(255, 0, 0), ident):
        self.matrix_index = matrix_index
        self.list_index = list_index
-
+       self.ident = Null
+       
        self.x = 60*matrix_index - 20
        self.y = 35*matrix_index + 70*list_index - 490
 
@@ -252,6 +254,18 @@ class Hex:
                 # Call motion_handler, passing southwests neighbor
                 self.motion_handler(future, hex_matrix[self.matrix_index - 1][self.list_index + 1], neighbors_movable, neighbors_wall, 4)
 
+class ident:
+
+    def __init__(self, color, state, behavior):
+        #color is unique to the ident object
+        self.color = color
+        #state indicates direction moved: [0-5] == up,upR,downR,down,downL,upL respectively, -1==still, -2==wall
+        self.state = state
+        #behavior indicates moveable, gummy, heavy etc
+        self.behavior = behavior
+        #add self to ident_list
+        ident_list.append(self)
+
 
 import pygame
 
@@ -292,31 +306,31 @@ for x in range(15):
         hex_list_new.append(myHex)
 
 # Update the state of a few hexagons to reflect motion (test cases)
-#hex_matrix[10][8].occupied = True
-hex_matrix[10][4].occupied = True
-# hex_matrix[4][7].occupied = True
-# hex_matrix[6][10].occupied = True
+hex_matrix[4][10].occupied = True
+hex_matrix[4][9].occupied = True
+hex_matrix[4][8].occupied = True
+hex_matrix[4][7].occupied = True
 # hex_matrix[3][5].occupied = True
 #hex_matrix[4][6].occupied = True
 
-hex_matrix[9][10].make_move(5)
+hex_matrix[4][9].make_move(3)
 
-#hex_matrix[4][6].make_move(3)
+hex_matrix[4][7].make_move(3)
 
-hex_matrix[7][7].make_move(3)
-hex_matrix[6][8].make_move(2)
-hex_matrix[8][7].make_move(4)
+#hex_matrix[7][7].make_move(3)
+#hex_matrix[6][8].make_move(2)
+#hex_matrix[8][7].make_move(4)
 
-hex_matrix[5][5].make_move(3)
-hex_matrix[4][6].make_move(2)
-hex_matrix[6][5].make_move(4)
+#hex_matrix[5][5].make_move(3)
+#hex_matrix[4][6].make_move(2)
+#hex_matrix[6][5].make_move(4)
 
 
 #hex_matrix[6][6].make_wall()
 #hex_matrix[5][9].make_wall()
 #hex_matrix[6][7].make_wall()
-hex_matrix[7][9].make_wall()
-hex_matrix[7][8].make_wall()
+#hex_matrix[7][9].make_wall()
+#hex_matrix[7][8].make_wall()
 
 # Create walls around the edges
 # Left edge
