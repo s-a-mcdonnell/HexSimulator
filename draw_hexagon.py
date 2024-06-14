@@ -36,7 +36,7 @@ class Hex:
            self.make_wall()
 
         # Create arrows for later use
-       #pivot is the center of the hexagon
+       # pivot is the center of the hexagon
        pivot = pygame.Vector2(self.x + 20, self.y + 35)
         # set of arrow points should be the vectors from the pivot to the edge points of the arrow
        arrow = [(0, -15), (10, -5), (5, -5), (5, 15), (-5, 15), (-5, -5), (-10, -5)]
@@ -47,7 +47,7 @@ class Hex:
 
     ##########################################################################################################
 
-    # sets the given hex to act as a wall
+    # Sets the given hex to act as a wall
    def make_wall(self):
        # Wipe idents currently stored
        self.idents = None
@@ -182,6 +182,8 @@ class Hex:
        else:
            return True
 
+    ##########################################################################################################
+
 # Checks if a hex contains an ident heading in the given directon
    # If it does, returns that ident
    # Else returns None
@@ -191,9 +193,7 @@ class Hex:
            if ident.state == dir:
                return ident
 
-       return None 
-
-    ##########################################################################################################
+       return None
 
     ##########################################################################################################
 
@@ -427,9 +427,6 @@ class Hex:
         
         return my_neighbors
 
-
-    ##########################################################################################################
-
     ##########################################################################################################
 
    #update self hexagon
@@ -466,6 +463,8 @@ class Hex:
             future.idents.append(is_stationary.copy())
 
 
+###############################################################################################################
+###############################################################################################################
 
 class Ident:
     # Constructor
@@ -548,7 +547,7 @@ dt = 0
 
 # set up state
 state = "pause"
-# states are "pause" "go" "step"
+# states are "pause" "go" "hyper"
 
 ##########################################################################################################
 
@@ -625,7 +624,7 @@ while run:
     pygame.display.flip()
 
     # sets animation to n frames per second where n is inside the parentheses (feel free to change)
-    dt = clock.tick(5) / 1000
+    #dt = clock.tick(2000) / 1000
 
     for hex_list in hex_matrix:
         for hexagon in hex_list:
@@ -643,11 +642,19 @@ while run:
             state = "go"
         elif keys[pygame.K_p]:
             state = "pause"
+        elif keys[pygame.K_h]:
+            state = "hyper"
 
         if state == "pause" and keys[pygame.K_s]:
             swap_matrices()
 
+
+
     if state == "go":
+        dt = clock.tick(5) / 1000
+        swap_matrices()
+    elif state == "hyper":
+        dt = clock.tick(2000) / 1000
         swap_matrices()
 
 pygame.quit()
