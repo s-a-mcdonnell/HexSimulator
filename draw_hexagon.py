@@ -718,9 +718,6 @@ while run:
         if state == "pause" and keys[pygame.K_s]:
             fast = False
             next_generation()
-            dt = clock.tick(1) / 1000
-            #TODO: Why is it taking two steps?
-            # - fixed by introduring time delay
 
     if state == "go":
         fast = True
