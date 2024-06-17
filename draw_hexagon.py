@@ -195,9 +195,9 @@ class Hex:
 
     ##########################################################################################################
 
-# Checks if a hex contains an ident heading in the given directon
-   # If it does, returns that ident
-   # Else returns None
+    # Checks if a hex contains an ident heading in the given directon
+    # If it does, returns that ident
+    # Else returns None
     def contains_direction(self, dir):
 
        for ident in self.idents:
@@ -206,7 +206,7 @@ class Hex:
 
        return None 
    
-   # Returns true if the given hex contains a wall ident, else returns false
+    # Returns true if the given hex contains a wall ident, else returns false
     def contains_wall(self):
         for ident in self.idents:
             if ident.state == -2:
@@ -219,6 +219,7 @@ class Hex:
     # Checks if a hex contains a portal ident
     # If it does, returns that ident
     # Else returns None
+    '''
     def contains_portal(self):
         for ident in self.idents:
             # TODO: Use int insteal of string for faster processing
@@ -226,8 +227,14 @@ class Hex:
                 return ident
 
         return None    
-
+    '''
     ##########################################################################################################
+
+    def is_sticky(self):
+        for ident in self.idents:
+            if ident.property == "portal":
+                return ident
+        return None
 
    # returns a list of length 6 to determine which of the neighbors around self hex are walls
     def check_walls(self):
@@ -316,7 +323,7 @@ class Hex:
 
     ##########################################################################################################
 
-   # Handles interactions between a hex and its environment with respect to the given direction
+    # Handles interactions between a hex and its environment with respect to the given direction
     def motion_handler(self, future, my_neighbors, neighbors_movable, neighbors_wall, dir):
         # straight_neighbor is the neighbor in that direction (ex. when dir = 0, straight_neighbor is the upper neighbor of self)
         straight_neighbor = my_neighbors[dir]
