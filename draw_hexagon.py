@@ -8,8 +8,8 @@ import os
 class Hex:
 
     # Create Coordinate
-   @staticmethod
-   def create_coor(x, y):
+    @staticmethod
+    def create_coor(x, y):
         # Making hex smaller so that borders will be visible
         return [(x+3, y+3), (x+37, y+3), (x+57, y+35), (x+37, y+67), (x+3, y+67), (x-17, y+35)]
 
@@ -18,47 +18,47 @@ class Hex:
     # Constructor
     # color is an optional parameter with a default value of red
     # movable is an optional parameter with a default value of true
-   def __init__(self, matrix_index, list_index, color=(255, 0, 0), movable=True, occupied=False):
-       self.matrix_index = matrix_index
-       self.list_index = list_index
+    def __init__(self, matrix_index, list_index, color=(255, 0, 0), movable=True, occupied=False):
+        self.matrix_index = matrix_index
+        self.list_index = list_index
 
-       self.x = 60*matrix_index - 20
-       self.y = 35*matrix_index + 70*list_index - 490
+        self.x = 60*matrix_index - 20
+        self.y = 35*matrix_index + 70*list_index - 490
 
-       self.coordinates = Hex.create_coor(self.x, self.y)
+        self.coordinates = Hex.create_coor(self.x, self.y)
        
-       # Store identities of hexes
-       self.idents = []
-       if occupied:
-           self.idents.append(Ident(color))
+        # Store identities of hexes
+        self.idents = []
+        if occupied:
+            self.idents.append(Ident(color))
 
-       if not movable:
-           self.make_wall()
+        if not movable:
+            self.make_wall()
 
         # Create arrows for later use
-       #pivot is the center of the hexagon
-       pivot = pygame.Vector2(self.x + 20, self.y + 35)
+        #pivot is the center of the hexagon
+        pivot = pygame.Vector2(self.x + 20, self.y + 35)
         # set of arrow points should be the vectors from the pivot to the edge points of the arrow
-       arrow = [(0, -15), (10, -5), (5, -5), (5, 15), (-5, 15), (-5, -5), (-10, -5)]
+        arrow = [(0, -15), (10, -5), (5, -5), (5, 15), (-5, 15), (-5, -5), (-10, -5)]
         # get arrow by adding all the vectors to the pivot point => allows for easy rotation
-       self.arrows = []
-       for i in range(6):
+        self.arrows = []
+        for i in range(6):
             self.arrows.append([(pygame.math.Vector2(x, y)).rotate(60.0*i) + pivot for x, y in arrow]) 
     
         # Coordinates used to draw smaller hexagon later if the hex becomes stationary
-       self.small_hexagon = [(self.x+9, self.y+11), (self.x+31, self.y+11), (self.x+47, self.y+35), (self.x+31, self.y+59), (self.x+9, self.y+59), (self.x-7, self.y+35)]
+        self.small_hexagon = [(self.x+9, self.y+11), (self.x+31, self.y+11), (self.x+47, self.y+35), (self.x+31, self.y+59), (self.x+9, self.y+59), (self.x-7, self.y+35)]
  
 
     ##########################################################################################################
 
     # sets the given hex to act as a wall
-   def make_wall(self):
-       # Wipe idents currently stored
-       self.idents = None
-       self.idents = []
-       # Walls are black
-       # -2 state is a wall
-       self.idents.append(Ident((0,0,0), -2))
+    def make_wall(self):
+        # Wipe idents currently stored
+        self.idents = None
+        self.idents = []
+        # Walls are black
+        # -2 state is a wall
+        self.idents.append(Ident((0,0,0), -2))
 
     ##########################################################################################################
 
@@ -66,62 +66,62 @@ class Hex:
 
     # sets the given hex to act as a portal
     # TODO: How to set destiantion?
-   def make_portal(self, pmi, pli):
-       # Portals are dark purple
-       # TODO: What state to pass?
-       # TODO: Rename variables
-       # TODO: Ideally, portals should be linked just to idents, not to hexes (so they can move)
-       self.idents.append(Ident((75, 4, 122), property="portal", pair_matrix_index=pmi, pair_list_index=pli))
+    def make_portal(self, pmi, pli):
+        # Portals are dark purple
+        # TODO: What state to pass?
+        # TODO: Rename variables
+        # TODO: Ideally, portals should be linked just to idents, not to hexes (so they can move)
+        self.idents.append(Ident((75, 4, 122), property="portal", pair_matrix_index=pmi, pair_list_index=pli))
 
     ##########################################################################################################
 
     ##########################################################################################################
 
     # sets the given hex to move in a given direction
-   def make_move(self, dir, color=(255,0,0)):
-       # Note: Does not overwrite idents currently stored
-       self.idents.append(Ident(color, dir))
+    def make_move(self, dir, color=(255,0,0)):
+        # Note: Does not overwrite idents currently stored
+        self.idents.append(Ident(color, dir))
 
     # Appends the passed ident to the given hex
-   def take_ident(self, ident):
-       if ident.state != -2:
+    def take_ident(self, ident):
+        if ident.state != -2:
             print("hex at " + str(self.matrix_index) + ", " + str(self.list_index) + " taking ident " + str(ident.serial_number))
-       self.idents.append(ident)    
+        self.idents.append(ident)    
 
-   def make_occupied(self, color=(0, 255, 0)):
-       # TODO: Clear out current idents? (does not currently overwrite pre-existing idents)
-       self.idents.append(Ident(color, -1))
+    def make_occupied(self, color=(0, 255, 0)):
+        # TODO: Clear out current idents? (does not currently overwrite pre-existing idents)
+        self.idents.append(Ident(color, -1))
 
-   # returns a boolean indicating if a hex is occupied 
-   # TODO: Maybe have this return false for portals?
-   def is_occupied(self):
-       return len(self.idents != 0)
+    # returns a boolean indicating if a hex is occupied 
+    # TODO: Maybe have this return false for portals?
+    def is_occupied(self):
+        return len(self.idents != 0)
 
     ##########################################################################################################
 
     # graphics
-   def draw(self, screen):
+    def draw(self, screen):
     
     # Default color (no idents): light blue
-    my_color = (190, 240, 255)
+        my_color = (190, 240, 255)
 
-    if (len(self.idents) >= 1):
-        # If a hex contains only one ident, take that color
-        # If a hex contains multiple idents, the ident stored first will be the outermost color
-        my_color = self.idents[0].color
+        if (len(self.idents) >= 1):
+            # If a hex contains only one ident, take that color
+            # If a hex contains multiple idents, the ident stored first will be the outermost color
+            my_color = self.idents[0].color
         
     # Draw the hexagon
-    pygame.draw.polygon(screen, my_color, self.coordinates)
+        pygame.draw.polygon(screen, my_color, self.coordinates)
 
     # Draw an extra hexagon to visually show that a hexagon is stationary even with the different colors
-    if self.contains_direction(-1) != None:
-        new_color = [max(0, c - 120) for c in my_color]
-        pygame.draw.polygon(screen, new_color, self.small_hexagon)
+        if self.contains_direction(-1) != None:
+            new_color = [max(0, c - 120) for c in my_color]
+            pygame.draw.polygon(screen, new_color, self.small_hexagon)
     
     # Draw multiple nesting circles indicating colors for hexes with superimposed idents/states
-    for i in range(1, len(self.idents)):
-        if (33 - 5*i) > 0:
-            pygame.draw.circle(screen, self.idents[i].color, (self.x+20, self.y+35), 33-5*i)
+        for i in range(1, len(self.idents)):
+            if (33 - 5*i) > 0:
+                pygame.draw.circle(screen, self.idents[i].color, (self.x+20, self.y+35), 33-5*i)
     
     # Draw text object displaying axial hex coordiantes
     # self.display_surface.blit(self.text, self.textRect)
@@ -130,18 +130,18 @@ class Hex:
 
     # draw an arrow on the hex if the hex is moving
     # TODO: Make smaller arrows for superimposed states? (to not hide nested colors)
-    if self.is_moving:
-        #pivot is the center of the hexagon
-        pivot = pygame.Vector2(self.x + 20, self.y + 35)
-        # set of arrow points should be the vectors from the pivot to the edge points of the arrow
-        arrow = [(0, -15), (10, -5), (5, -5), (5, 15), (-5, 15), (-5, -5), (-10, -5)]
-        # get arrow by adding all the vectors to the pivot point => allows for easy rotation
-        for i in range(6):
-            if self.contains_direction(i):
-                pygame.draw.polygon(screen, (0, 0, 0), self.arrows[i])
+        if self.is_moving:
+            #pivot is the center of the hexagon
+            pivot = pygame.Vector2(self.x + 20, self.y + 35)
+            # set of arrow points should be the vectors from the pivot to the edge points of the arrow
+            arrow = [(0, -15), (10, -5), (5, -5), (5, 15), (-5, 15), (-5, -5), (-10, -5)]
+            # get arrow by adding all the vectors to the pivot point => allows for easy rotation
+            for i in range(6):
+                if self.contains_direction(i):
+                    pygame.draw.polygon(screen, (0, 0, 0), self.arrows[i])
 
     # returns a boolean indicating if the given hex is occupied, movable, and stationary (not currently moving)
-   def check_movable_hex(self):
+    def check_movable_hex(self):
        #return (not self.is_moving) and self.movable and self.occupied
        for ident in self.idents:
            if ident.state == -1:
@@ -150,11 +150,11 @@ class Hex:
        return False
 
     # returns a boolean indicating if the hex is currently moving
-   def is_moving(self):
+    def is_moving(self):
         return self.contains_direction(0) or self.contains_direction(1) or self.contains_direction(2) or self.contains_direction(3) or self.contains_direction(4) or self.contains_direction(5)
    
    # returns a list of length six representing the six neighboring hexes of self, with 1 if the hex neighboring in that direction is movable, nonmoving, and occupied
-   def check_movables(self): 
+    def check_movables(self): 
         hex_movable = [0, 0, 0, 0, 0, 0]
 
         # Initializing hexToCheck with default value (reducing repeated memory allocation and deallocation)
@@ -198,7 +198,7 @@ class Hex:
 # Checks if a hex contains an ident heading in the given directon
    # If it does, returns that ident
    # Else returns None
-   def contains_direction(self, dir):
+    def contains_direction(self, dir):
 
        for ident in self.idents:
            if ident.state == dir:
@@ -207,30 +207,30 @@ class Hex:
        return None 
    
    # Returns true if the given hex contains a wall ident, else returns false
-   def contains_wall(self):
-       for ident in self.idents:
-           if ident.state == -2:
+    def contains_wall(self):
+        for ident in self.idents:
+            if ident.state == -2:
                 return True
            
-       return False    
+        return False    
 
     ##########################################################################################################
 
     # Checks if a hex contains a portal ident
     # If it does, returns that ident
     # Else returns None
-   def contains_portal(self):
-       for ident in self.idents:
-           # TODO: Use int insteal of string for faster processing
-           if ident.property == "portal":
+    def contains_portal(self):
+        for ident in self.idents:
+            # TODO: Use int insteal of string for faster processing
+            if ident.property == "portal":
                 return ident
 
-       return None    
+        return None    
 
     ##########################################################################################################
 
    # returns a list of length 6 to determine which of the neighbors around self hex are walls
-   def check_walls(self):
+    def check_walls(self):
         hex_walls = [0, 0, 0, 0, 0, 0]
 
         # Default value of hexToCheck (not used)
@@ -238,13 +238,13 @@ class Hex:
 
         # check upper hex (pos 0)
         if self.list_index - 1 >= 0:
-           hexToCheck = hex_matrix[self.matrix_index][self.list_index - 1]
-           hex_walls[0] = hexToCheck.contains_wall()
+            hexToCheck = hex_matrix[self.matrix_index][self.list_index - 1]
+            hex_walls[0] = hexToCheck.contains_wall()
 
          # check northeast hex (pos 1)
         if (self.matrix_index + 1 < len(hex_matrix)) and (self.list_index - 1 >= 0):
-           hexToCheck = hex_matrix[self.matrix_index + 1][self.list_index - 1]
-           hex_walls[1] = hexToCheck.contains_wall()
+            hexToCheck = hex_matrix[self.matrix_index + 1][self.list_index - 1]
+            hex_walls[1] = hexToCheck.contains_wall()
 
 
         # check southeast hex (pos 2)
@@ -276,7 +276,7 @@ class Hex:
     ##########################################################################################################
 
     # handles the impacts of hitting an occupied neighbor (either a stationary object or a wall)
-   def hit_neighbor(self, future, my_neighbors, neighbors_movable, neighbors_wall, dir):
+    def hit_neighbor(self, future, my_neighbors, neighbors_movable, neighbors_wall, dir):
         # cases for individual side glancing walls
         if (neighbors_wall[(dir-1)%6] == 1) and not (neighbors_wall[(dir+1)%6] == 1):
             print("hit neighbor case 1, dir = " + str(dir))
@@ -317,21 +317,21 @@ class Hex:
     ##########################################################################################################
 
    # Handles interactions between a hex and its environment with respect to the given direction
-   def motion_handler(self, future, my_neighbors, neighbors_movable, neighbors_wall, dir):
+    def motion_handler(self, future, my_neighbors, neighbors_movable, neighbors_wall, dir):
         # straight_neighbor is the neighbor in that direction (ex. when dir = 0, straight_neighbor is the upper neighbor of self)
-       straight_neighbor = my_neighbors[dir]
+        straight_neighbor = my_neighbors[dir]
 
         # TODO: Janky quick fix for portals (In this method, no collisions happen in/on portals)
-       if self.contains_portal():
-           neighbor_ident = straight_neighbor.contains_direction((dir+3)%6)
-           if neighbor_ident:
+        if self.contains_portal():
+            neighbor_ident = straight_neighbor.contains_direction((dir+3)%6)
+            if neighbor_ident:
                 future.take_ident(neighbor_ident)
-           return
+            return
 
         # if my neighbor is moving toward me and is not blocked by either of two side walls, I will gain motion
-       if (not neighbors_wall[(dir+1)%6]) and (not neighbors_wall[(dir-1)%6]):
-           neighbor_ident = straight_neighbor.contains_direction((dir+3)%6)
-           if neighbor_ident != None:
+        if (not neighbors_wall[(dir+1)%6]) and (not neighbors_wall[(dir-1)%6]):
+            neighbor_ident = straight_neighbor.contains_direction((dir+3)%6)
+            if neighbor_ident != None:
                 # My identity pointing in the given direction, if it exists
                 my_ident = self.contains_direction(dir)
 
@@ -461,11 +461,11 @@ class Hex:
                     future.take_ident(neighbor_ident)
         
         # handle impact of hitting occupied neighbor
-       if self.contains_direction(dir): 
-           self.hit_neighbor(future, my_neighbors, neighbors_movable, neighbors_wall, dir)
+        if self.contains_direction(dir): 
+            self.hit_neighbor(future, my_neighbors, neighbors_movable, neighbors_wall, dir)
 
     # returns an array of neighbors (the entry in the array is None when the neighbor does not exist)
-   def get_neighbors(self):
+    def get_neighbors(self):
         my_neighbors = [None, None, None, None, None, None]
 
         try:
@@ -512,7 +512,7 @@ class Hex:
     ##########################################################################################################
 
    #update self hexagon
-   def update(self):
+    def update(self):
         # determine the state of the current hex based on the states of the hexes around it
         future = hex_matrix_new[self.matrix_index][self.list_index]
         future.idents = []
