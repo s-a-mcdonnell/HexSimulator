@@ -521,6 +521,8 @@ class Ident:
         self.state = state
         self.property = property
 
+        self.hist = []
+
         # Record serial number and iterate
         if serial_number == -1:
             # If no serial number is provided
@@ -545,6 +547,23 @@ class Ident:
         # TODO: Review copy method
         new_copy = Ident(self.color, self.state, self.serial_number, self.property)
         return new_copy
+
+    def visited(self, x, y):
+        # push onto stack history
+        # pushed onto the history is
+            # hex matix index (x,y)
+            # current state
+
+        self.hist.append((x, y, self.state))
+        # this syntax might not work
+
+    def back(self, ):
+        # go back 1 state
+        # code for going back from hist. array
+
+        # because the code is deterministic, we will go down the same path again, so we can delete the last one
+        self.hist.pop()
+
     
 
 ###############################################################################################################
