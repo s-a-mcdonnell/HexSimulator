@@ -1022,12 +1022,11 @@ while (run) and (not goalEnd):
 if(goalEnd):
     print("SIM OVER, WE HIT GOAL")
     screen.fill((255, 255, 255))
-    # insert info page here
+    # TODO: insert info page here
+    # pretty drawing here
     pygame.display.update()
     while(goalEnd):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 goalEnd = False
 pygame.quit()
-
-
