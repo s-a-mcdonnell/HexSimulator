@@ -77,6 +77,13 @@ class Hex:
 
     ##########################################################################################################
 
+    def make_sticky(self):
+        self.idents = sticky
+
+    ##########################################################################################################
+
+    ##########################################################################################################
+
     # sets the given hex to move in a given direction
     def make_move(self, dir, color=(255,0,0)):
         # Note: Does not overwrite idents currently stored
@@ -232,9 +239,11 @@ class Hex:
 
     def is_sticky(self):
         for ident in self.idents:
-            if ident.property == "portal":
+            if ident.property == "sticky":
                 return ident
         return None
+
+    ###########################################################################################################
 
    # returns a list of length 6 to determine which of the neighbors around self hex are walls
     def check_walls(self):
@@ -334,7 +343,7 @@ class Hex:
             if neighbor_ident:
                 future.take_ident(neighbor_ident)
             return
-
+        if self.
         # if my neighbor is moving toward me and is not blocked by either of two side walls, I will gain motion
         if (not neighbors_wall[(dir+1)%6]) and (not neighbors_wall[(dir-1)%6]):
             neighbor_ident = straight_neighbor.contains_direction((dir+3)%6)
@@ -659,6 +668,11 @@ def read_line(line):
         pair_list_index = int(line_parts[4])  
         hex_matrix[matrix_index][list_index].make_portal(pair_matrix_index, pair_list_index)
         hex_matrix[pair_matrix_index][pair_list_index].make_portal(matrix_index, list_index)
+    elif command == "sticky" or command == "sticky\n":
+        direction = int(line_parts[4])
+        color_text = line_parts[3]
+        color = get_color(color_text)
+        hex_matrix[matrix_index][list_index].make_move(direction, color)
 
 def swap_matrices():
     global hex_matrix
