@@ -518,6 +518,7 @@ class Hex:
                     future.take_ident(ident_to_flip)
                 elif counterclockwise_neighbor_ident != None and clockwise_neighbor_ident != None:
                     # If three arrows are approaching at 60 degree angles and I am in the middle, I go straight
+                    # TODO: The prioritization of 3-hex collisions over 2-hex collisions makes it difficult/unclear how to implement 4 hexes
                     print("case 1.5")
                     future.take_ident(neighbor_ident)
     
@@ -664,6 +665,7 @@ class Hex:
         if not self.contains_wall():
             # TODO: Adjust to account for idents
 
+# TODO: Maybe let 4-, 5-, and 6-hex collisions be handled in some other way? (rather than by passing direction)
             for i in range(6):
                 if my_neighbors[i] != None:
                     self.motion_handler(future, my_neighbors, neighbors_movable, neighbors_wall, i)

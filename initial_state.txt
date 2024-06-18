@@ -1,12 +1,4 @@
-4 10 portal 7 8
-5 10 move GREEN 5
-3 10 move PINK 2
-5 9 move YELLOW 4
-4 7 occupied RED
-5 6 occupied ORANGE
-7 6 move PURPLE 3
-9 5 move GREY 1
-9 6 occupied MAROON
-8 7 occupied CYAN
-7 9 occupied BLUE
-4 9 wall
+5 7 move GREEN 3
+6 7 move BLUE 4
+6 8 move PURPLE 5
+5 9 move RED 0
