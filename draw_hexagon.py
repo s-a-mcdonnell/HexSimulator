@@ -77,6 +77,9 @@ class Hex:
        # TODO: Clear out current idents? (does not currently overwrite pre-existing idents)
        self.idents.append(Ident(color, -1))
 
+   def make_goalpost(self, color=(247, 173, 45)):
+       self.idents.append(Ident(color, -1, -1, "goal"))
+
    # returns a boolean indicating if a hex is occupied 
    def is_occupied(self):
        return len(self.idents != 0)
@@ -101,6 +104,10 @@ class Hex:
     if self.contains_direction(-1) != None:
         new_color = [max(0, c - 120) for c in my_color]
         pygame.draw.polygon(screen, new_color, self.small_hexagon)
+
+    # need a function to check if a hex in the idents list of someone contains a certain property  
+    if self.contains_property("goal") != None:
+        pygame.draw.polygon(screen, (255, 230, 155), self.small_hexagon)
     
     # Draw multiple nesting circles indicating colors for hexes with superimposed idents/states
     for i in range(1, len(self.idents)):
@@ -187,6 +194,13 @@ class Hex:
            return False
        else:
            return True
+       
+   def check_prop_hex(self, prop):
+       # there should never be a goal that hasn't been filled that has more than one ident
+       if (len(self.idents) != 1) or (self.idents[0].property != prop):
+           return False
+       else:
+           return True
 
 # Checks if a hex contains an ident heading in the given directon
    # If it does, returns that ident
@@ -198,6 +212,12 @@ class Hex:
                return ident
 
        return None 
+   
+   # checks if a hex contains an ident with a specified property
+   def contains_property(self, prop):
+       for ident in self.idents:
+           if ident.property == prop:
+               return ident
 
     ##########################################################################################################
 
@@ -244,8 +264,45 @@ class Hex:
             hexToCheck = hex_matrix[self.matrix_index - 1][self.list_index]
             hex_walls[5] = hexToCheck.check_wall_hex()
 
-
         return hex_walls
+   
+   def get_neighbor_property(self, prop):
+        hex_prop = []
+        # Default value of hexToCheck (not used)
+        hexToCheck = self
+
+        # check upper hex (pos 0)
+        if self.list_index - 1 >= 0:
+           hexToCheck = hex_matrix[self.matrix_index][self.list_index - 1]
+           hex_prop[0] = hexToCheck.check_prop_hex(prop)
+
+         # check northeast hex (pos 1)
+        if (self.matrix_index + 1 < len(hex_matrix)) and (self.list_index - 1 >= 0):
+           hexToCheck = hex_matrix[self.matrix_index + 1][self.list_index - 1]
+           hex_prop[1] = hexToCheck.check_prop_hex(prop)
+
+        # check southeast hex (pos 2)
+        if self.matrix_index + 1 < len(hex_matrix):
+            hexToCheck = hex_matrix[self.matrix_index + 1][self.list_index]
+            hex_prop[2] = hexToCheck.check_prop_hex(prop)
+
+        # check down hex (pos 3)
+        if self.list_index + 1 < len(hex_list):
+            hexToCheck = hex_matrix[self.matrix_index][self.list_index + 1]
+            hex_prop[3] = hexToCheck.check_prop_hex(prop)
+
+        # check southwest hex (pos 4)
+        if (self.matrix_index - 1 >= 0) and (self.list_index + 1 < len(hex_list)):
+            hexToCheck = hex_matrix[self.matrix_index - 1][self.list_index + 1]
+            hex_prop[4] = hexToCheck.check_prop_hex(prop)
+
+         # check northwest hex (pos 5)
+        if self.matrix_index - 1 >= 0:
+            hexToCheck = hex_matrix[self.matrix_index - 1][self.list_index]
+            hex_prop[5] = hexToCheck.check_prop_hex(prop)
+
+        return hex_prop
+
    
    def get_neighbors(self):
         my_neighbors = [None, None, None, None, None, None]
@@ -419,7 +476,6 @@ class Hex:
                 future.take_ident(to_take)
                 for i in future_to_store:
                     self.take_ident(i)
-
 
             elif ("True, True" in str(neighbors_movable) or str(neighbors_movable) == "[True, False, False, False, False, True]") and len(stationary_left_behind) == 2:
                 # if this is true, the collision had its two incoming hexes at a 60 degree angle from each other
@@ -663,11 +719,6 @@ class Hex:
         if is_stationary and (len(future.idents) == 0):
             future.idents.append(is_stationary.copy())
 
-        trouble = next((Ident for Ident in self.idents if Ident.serial_number == 60), None)
-        if trouble is not None:
-            print("New trouble (60) hex at: ")
-            print(str(self.matrix_index) + " " + str(self.list_index))
-
 
 
 class Ident:
@@ -752,6 +803,8 @@ def read_line(line):
         hex_matrix[matrix_index][list_index].make_occupied(color)
     elif command == "wall" or command == "wall\n":
         hex_matrix[matrix_index][list_index].make_wall()
+    elif command == "goal" or command == "goal\n":
+        hex_matrix[matrix_index][list_index].make_goalpost()
 
 def swap_matrices():
     global hex_matrix
@@ -886,8 +939,9 @@ fast = True
 ##########################################################################################################
 
 run = True
+goalEnd = False
 frames_created = 0
-while run:
+while (run) and (not goalEnd):
 
     if fast == False:
         pygame.time.delay(100)
@@ -952,7 +1006,11 @@ while run:
     
     check_for_repeat_identities()
 
-
-pygame.quit()
+if(goalEnd):
+    screen.fill((0, 0, 0))
+    time.sleep(30)
+    pygame.quit()
+else:
+    pygame.quit()
 
 

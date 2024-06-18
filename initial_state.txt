@@ -1,3 +1,2 @@
-5 8 occupied RED 3
-6 8 move PINK 5
-4 9 move BLUE 1
+4 10 move BLUE 0
+4 7 goal
