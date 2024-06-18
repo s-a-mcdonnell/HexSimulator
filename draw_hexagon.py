@@ -66,16 +66,27 @@ class Hex:
 
     # sets the given hex to move in a given direction
    def make_move(self, dir, color=(255,0,0)):
+       ident = Ident(color, dir)
+
+       # trying hist
+       ident.visited(self.list_index, self.matrix_index)
+
        # Note: Does not overwrite idents currently stored
-       self.idents.append(Ident(color, dir))
+       self.idents.append(ident)
 
     # Appends the passed ident to the given hex
    def take_ident(self, ident):
-       self.idents.append(ident)    
+       ident.visited(self.list_index, self.matrix_index)
+       self.idents.append(ident)
+
+
 
    def make_occupied(self, color=(0, 255, 0)):
+       ident = Ident(color, -1)
        # TODO: Clear out current idents? (does not currently overwrite pre-existing idents)
-       self.idents.append(Ident(color, -1))
+       self.idents.append(ident)
+
+       ident.visited(self.list_index, self.matrix_index)
 
    # returns a boolean indicating if a hex is occupied 
    def is_occupied(self):
@@ -555,14 +566,19 @@ class Ident:
             # current state
 
         self.hist.append((x, y, self.state))
-        # this syntax might not work
 
-    def back(self, ):
+    def back(self):
         # go back 1 state
         # code for going back from hist. array
+        self.hist.pop()
 
         # because the code is deterministic, we will go down the same path again, so we can delete the last one
-        self.hist.pop()
+        gohere = self.hist.pop()
+
+        return gohere
+
+
+
 
     
 
@@ -660,6 +676,30 @@ def next_generation():
                     hexagon.update()
     
     swap_matrices()
+
+
+def past_generation():
+    print("---")
+    print("Going back 1 step")
+
+    items = []
+
+    # Iterates through the hexagons, determining what their next state should be
+    for hex_list in hex_matrix:
+        for hexagon in hex_list:
+            # find all items, store into list
+            if len(hexagon.idents) != 0:
+                check = hexagon.idents
+                if check[2] != -2:
+                    items.extend(hexagon.idents)
+                    # erase current state
+                    hexagon.idents = []
+
+    # fill in last state for every hex
+    for item in items:
+        past = item.back()
+        item.state = past[2]
+        hex_matrix[past[1]][past[0]].take_ident(item)
 
 import pygame
 
@@ -783,10 +823,14 @@ while run:
         if state == "pause" and keys[pygame.K_s]:
             fast = False
             next_generation()
-            pygame.time.delay(1000)
+            pygame.time.delay(100)
             #TODO: Why is it taking two steps?
                 # it was taking 2 steps becaue the pygame clock runs so dfast that it was taking multiple inputs of s for every click
                 # solved by adding a 1 second delay after step input
+
+        if state == "pause" and keys[pygame.K_b]:
+            fast = False
+            past_generation()
 
     if state == "go":
         fast = True
