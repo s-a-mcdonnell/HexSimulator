@@ -5,6 +5,8 @@ import os
 ###############################################################################################################
 ###############################################################################################################
 
+goalEnd = False
+
 class Hex:
 
     # Create Coordinate
@@ -267,7 +269,7 @@ class Hex:
         return hex_walls
    
    def get_neighbor_property(self, prop):
-        hex_prop = []
+        hex_prop = [0, 0, 0, 0, 0, 0]
         # Default value of hexToCheck (not used)
         hexToCheck = self
 
@@ -402,8 +404,18 @@ class Hex:
 
     # handles the impacts of hitting an occupied neighbor (either a stationary object or a wall)
    def hit_neighbor(self, future, my_neighbors, neighbors_movable, neighbors_wall, dir):
+        # cases for hitting a neighboring goal
+        neighbors_goal = self.get_neighbor_property("goal")
+        if(neighbors_goal[dir] == True):
+            print("moving hex run into goal")
+            print("self color " + str(self.contains_direction(dir).color))
+            print("self location (" + str(self.matrix_index) + ", " + str(self.list_index) + ")")
+            global goalEnd
+            goalEnd = True
+            print("allegedly changed")
+
         # cases for individual side glancing walls
-        if (neighbors_wall[(dir-1)%6] == 1) and not (neighbors_wall[(dir+1)%6] == 1):
+        elif (neighbors_wall[(dir-1)%6] == 1) and not (neighbors_wall[(dir+1)%6] == 1):
             print("hit neighbor case 1, dir = " + str(dir))
             print("self color " + str(self.contains_direction(dir).color))
             print("self location (" + str(self.matrix_index) + ", " + str(self.list_index) + ")")
@@ -668,7 +680,9 @@ class Hex:
                 else:
                     # Else take on identity of neighbor
                     print("case 8")
-                    future.take_ident(neighbor_ident)
+                    # unless neighbor is a goal
+                    if(self.get_neighbor_property("goal")[dir] == False):
+                        future.take_ident(neighbor_ident)
                     if self.contains_direction(-1) and (future.contains_direction(-1) == None):
                         future.take_ident(self.contains_direction(-1).copy())
                         print("Case 8: took on ident of my neighbor, I am " + str(self.matrix_index) + " " + str(self.list_index))
@@ -939,7 +953,6 @@ fast = True
 ##########################################################################################################
 
 run = True
-goalEnd = False
 frames_created = 0
 while (run) and (not goalEnd):
 
@@ -1007,10 +1020,14 @@ while (run) and (not goalEnd):
     check_for_repeat_identities()
 
 if(goalEnd):
-    screen.fill((0, 0, 0))
-    time.sleep(30)
-    pygame.quit()
-else:
-    pygame.quit()
+    print("SIM OVER, WE HIT GOAL")
+    screen.fill((255, 255, 255))
+    # insert info page here
+    pygame.display.update()
+    while(goalEnd):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                goalEnd = False
+pygame.quit()
 
 
