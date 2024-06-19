@@ -1,2 +1,1 @@
-9 8 move GREEN 5
-7 8 portal 4 10
+9 8 sticky GREEN 5 8

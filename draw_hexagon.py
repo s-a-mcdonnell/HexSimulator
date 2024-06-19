@@ -78,7 +78,7 @@ class Hex:
     ##########################################################################################################
 
     def make_sticky(self):
-        self.idents = sticky
+        self.idents = "sticky"
 
     ##########################################################################################################
 
@@ -226,7 +226,7 @@ class Hex:
     # Checks if a hex contains a portal ident
     # If it does, returns that ident
     # Else returns None
-    '''
+    
     def contains_portal(self):
         for ident in self.idents:
             # TODO: Use int insteal of string for faster processing
@@ -234,7 +234,7 @@ class Hex:
                 return ident
 
         return None    
-    '''
+    
     ##########################################################################################################
 
     def is_sticky(self):
@@ -343,7 +343,12 @@ class Hex:
             if neighbor_ident:
                 future.take_ident(neighbor_ident)
             return
-        if self.
+        
+        if self.is_sticky():
+            #check if the hex 'dead ahead' from direction is a wall, if so, become wall in future, elsewise, move on to normal movement
+            if my_neighbors[dir] == neighbors_wall[dir]:
+                self.make_wall
+
         # if my neighbor is moving toward me and is not blocked by either of two side walls, I will gain motion
         if (not neighbors_wall[(dir+1)%6]) and (not neighbors_wall[(dir-1)%6]):
             neighbor_ident = straight_neighbor.contains_direction((dir+3)%6)
