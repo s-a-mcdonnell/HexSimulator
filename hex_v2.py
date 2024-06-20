@@ -138,7 +138,7 @@ class Ident:
 
     ##########################################################################################################
 
-    def __init__(self, matrix_index, list_index, color=(255, 255, 255), state = -1, serial_number = -1, hist = None):
+    def __init__(self, matrix_index, list_index, world, color=(255, 255, 255), state = -1, serial_number = -1, hist = None):
         if hist is None:
             hist = []
         self.color = color
@@ -164,22 +164,60 @@ class Ident:
 
         self.matrix_index = matrix_index
         self.list_index = list_index
+
+        self.world = world
+
+    # returns an Ident with the same properties as self
+    def copy(self):
+        # TODO: Review copy method
+        new_copy = Ident(self.matrix_index, self.list_index, self.world, self.color, self.state, self.serial_number, self.hist)
+        return new_copy
+    
+    # returns new coordinates in a list for the ident to go based on a direction passed in
+    def get_new_pos(self, dir):
+        to_return = [self.matrix_index, self.list_index]
+
+        return to_return
     
     # TODO: Write this method
     def advance_or_flip(self):
         pass
 
     # TODO: Write this method
-    def repair_collisions(self, hex_matrix):
+    # note that I should never have to deal with walls in this method
+    def repair_collisions(self):
+
+        w = self.world
 
         # obtain the hex that this ident is a part of
-        hex = hex_matrix[self.matrix_index][self.list_index]
+        hex = w.hex_matrix[self.matrix_index][self.list_index]
         if len(hex.idents) <= 1:
             print("No collision to resolve")
             return
         
         # now we have determined that the ident has other idents with it
-        my_index = hex.
+        my_index = hex.get_ident_index(self)
+
+        directions = []
+
+        # TODO: consider appending just the directions/states of the idents instead of appending the idents themselves
+        for i in range(len(hex.idents)):
+            if i != my_index:
+                directions.append(hex.idents[i])
+
+        # if there was only one other ident in the collision, take its attributes
+        if len(directions) == 1:
+            to_become = self.copy()
+            to_become.state = directions[0].state
+            # additionally, move it forward depending on the direction
+            # if the other hex was stationary, do not move it forward at all, keep it in place
+            w.ident_list_new.append(to_become)
+        # if there is more than one other ident than self, we do averaging things
+        else:
+            pass
+
+
+        
 
 
 ###############################################################################################################
