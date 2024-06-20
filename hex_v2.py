@@ -474,7 +474,7 @@ class World:
         for ident in self.ident_list_new:
             ident.repair_collisions()'''
         
-        # TODO: Comment this back out when Ident.repair_collisions() is written
+        # TODO: Comment this back out when Ident.repair_collisions() is written (adavance_or_flip writes from hex_matrix to hex_matrix_new, and repair_collisions can write from hex_matrix_new to hew_matrix)
         self.__swap_matrices_and_lists()
     
     ##########################################################################################################
