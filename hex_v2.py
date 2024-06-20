@@ -220,7 +220,11 @@ class Ident:
     # TODO: Does this method still have a purpose?
     def __neighbor_contains_direction(self, dir):
 
-        return self.__get_neighbor(self.world.hex_matrix, self.state).contains_direction(dir)
+        try:
+            return self.__get_neighbor(self.world.hex_matrix, self.state).contains_direction(dir)
+        except:
+            print("Neighbor DNE")
+            return None
 
     ##########################################################################################################
 
@@ -278,9 +282,13 @@ class Ident:
         # Advance all others (if the location where they would advance to exists)
         future_neighbor = self.__get_neighbor(future_matrix, self.state)
         if future_neighbor:
-            # TODO: Append self or self.copy()?
-            future_list.append(self)
-            future_neighbor.idents.append(self)
+            print("advance to future neighbor")
+            copy_to_move = self.__copy()
+            copy_to_move.matrix_index = future_neighbor.matrix_index
+            copy_to_move.list_index = future_neighbor.list_index
+                
+            future_list.append(copy_to_move)
+            future_neighbor.idents.append(copy_to_move)
 
     ##########################################################################################################
 
@@ -461,13 +469,13 @@ class World:
         for ident in self.ident_list:
             ident.advance_or_flip()
                 
-        # Fix collisions
+        '''# Fix collisions
         for ident in self.ident_list_new:
-            ident.repair_collisions()
+            ident.repair_collisions()'''
         
         # TODO: Have advance_or_flip write from original and new
         # TODO: Have repair_collisions write from new to original
-        # self.__swap_matrices_and_lists()
+        self.__swap_matrices_and_lists()
     
     ##########################################################################################################
 
@@ -487,5 +495,7 @@ class World:
             
             self.__update()
         
+            pygame.time.delay(100)
+
         # Exit
         pygame.quit()
