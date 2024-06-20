@@ -468,13 +468,13 @@ class World:
         # Move or flip all idents
         for ident in self.ident_list:
             ident.advance_or_flip()
-                
+
+        # TODO: Comment this back in when Ident.repair_collisions() is written     
         '''# Fix collisions
         for ident in self.ident_list_new:
             ident.repair_collisions()'''
         
-        # TODO: Have advance_or_flip write from original and new
-        # TODO: Have repair_collisions write from new to original
+        # TODO: Comment this back out when Ident.repair_collisions() is written
         self.__swap_matrices_and_lists()
     
     ##########################################################################################################
