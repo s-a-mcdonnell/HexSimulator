@@ -83,6 +83,15 @@ class Hex:
 
     ##########################################################################################################
 
+    # Creates a wall identity and gives it to the hex indicated
+    def make_wall(self, world):
+        ident = Ident(self.matrix_index, self.list_index, world, color=(0,0,0), state=-2)
+        world.ident_list.append(ident)
+        self.idents.append(ident)
+
+
+    ##########################################################################################################
+
     # Graphics (drawing hexes and the corresponding idents)
     def draw(self, screen):
             
@@ -298,6 +307,8 @@ class Ident:
 
         pass
 
+    ##########################################################################################################
+
     def visited(self, m, l):
         # push onto stack history
         # pushed onto the history is
@@ -354,12 +365,29 @@ class World:
             for y in range(16):
                 myHex = Hex(x, y)
                 hex_list_new.append(myHex)
-
+        
         # Set up ident list
         self.ident_list = []
 
         # Set up new ident list
         self.ident_list_new = []
+
+        # Create walls around the edges
+        # Left edge
+        for hex in self.hex_matrix[0]:
+            hex.make_wall(self)
+        # Right edge
+        for hex in self.hex_matrix[13]:
+            hex.make_wall(self)
+        for i in range(6):
+            # Top edge
+            self.hex_matrix[1+2*i][6-i].make_wall(self)
+            self.hex_matrix[2+2*i][6-i].make_wall(self)
+
+            # Bottom edge
+            self.hex_matrix[1+2*i][15-i].make_wall(self)
+            self.hex_matrix[2+2*i][14-i].make_wall(self)
+
 
         # reading the intiial state of the hex board from a file
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
