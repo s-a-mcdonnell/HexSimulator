@@ -1,1 +1,1 @@
-5 5 move GREEN 3
+5 10 move GREEN 1

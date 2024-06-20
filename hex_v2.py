@@ -268,8 +268,28 @@ class Ident:
             future_hex.idents.append(self.__copy())
 
             return
+        
+        # If need to bounce diagonally off of a wall, then bounce and return
+        neighbor_minus_one = self.__get_neighbor(self.world.hex_matrix, (self.state - 1)%6)
+        if neighbor_minus_one and neighbor_minus_one.contains_direction(-2):
+            copy_to_flip = self.__copy()
+            copy_to_flip.state = (copy_to_flip.state + 1)%6
+            future_list.append(copy_to_flip)
+            future_hex.idents.append(copy_to_flip)
 
-        # If need to bounce (wall or head-on), then bounce and return
+            return
+        
+        # Other diagonal wall bounce case
+        neighbor_plus_one = self.__get_neighbor(self.world.hex_matrix, (self.state + 1)%6)
+        if neighbor_plus_one and neighbor_plus_one.contains_direction(-2):
+            copy_to_flip = self.__copy()
+            copy_to_flip.state = (copy_to_flip.state - 1)%6
+            future_list.append(copy_to_flip)
+            future_hex.idents.append(copy_to_flip)
+
+            return
+
+        # If need to bounce head-on off of a wall, then bounce and return
         if self.__neighbor_is_wall():
             # TODO: Reintroduce flip and append method?
             copy_to_flip = self.__copy()
@@ -278,7 +298,8 @@ class Ident:
             future_hex.idents.append(copy_to_flip)
             
             return
-        
+                
+        # If need to bounce head-on off of another ident, then bounce and return
         if self.__head_on_collision():
             # TODO: Reintroduce flip and append method?
             copy_to_flip = self.__copy()
