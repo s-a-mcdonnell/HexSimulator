@@ -407,6 +407,7 @@ class Hex:
                     print("Took ident " + str(ident_to_stop.color) + " " + str(ident_to_stop.state))
 
    # Handles case with six neighbors pointing at self
+   # pointing_neighbors is a list of the relevant idents
    def six_neighbors_case(self, pointing_neighbors):
        future = hex_matrix_new[self.matrix_index][self.list_index]
 
@@ -415,7 +416,32 @@ class Hex:
            ident_to_flip = neighbor_ident.copy()
            ident_to_flip.state = (ident_to_flip.state + 3)%6
            future.take_ident(ident_to_flip)
-           
+
+
+   # Handles case with five neighbors pointing at self
+   # pointing_neighbors is a list of the relevant idents
+   def five_neighbors_case(self, pointing_neighbors):
+       future = hex_matrix_new[self.matrix_index][self.list_index]
+
+       # Identify which direction does not have an approaching ident
+       null_dir = -1
+       for i in range(len(pointing_neighbors)):
+           if not pointing_neighbors[i]:
+               null_dir = i
+               break
+       assert(null_dir != -1) 
+      
+       # Flip the four idents that have an opposite partner
+       for i in range(len(pointing_neighbors)):
+           if (i != null_dir) and (i != (null_dir+3)%6):
+               ident_to_flip = pointing_neighbors[i].copy()
+               ident_to_flip.state = (ident_to_flip.state + 3)%6
+               future.take_ident(ident_to_flip)
+
+       # Let the other ident pass through
+       # TODO: Check if this is really how we want the physics to work
+       future.take_ident(pointing_neighbors[(null_dir+3)%6])  
+
 
     ##########################################################################################################
 
@@ -704,7 +730,10 @@ class Hex:
             if num_pointing_neighbors == 6:
                 # Case for 6 neighbors pointing at me
                 self.six_neighbors_case(my_neighbors_pointing_at_me)
-
+            
+            elif num_pointing_neighbors == 5:
+                # Case for 5 neighbors pointing at me
+                self.five_neighbors_case(my_neighbors_pointing_at_me)
 
 # TODO: Maybe let 4-, 5-, and 6-hex collisions be handled in some other way? (rather than by passing direction)
             else:

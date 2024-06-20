@@ -3,4 +3,3 @@
 6 8 move PURPLE 5
 5 9 move RED 0
 4 9 move PINK 1
-4 8 move ORANGE 2
