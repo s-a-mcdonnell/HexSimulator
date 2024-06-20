@@ -2,6 +2,9 @@ import time
 import copy
 import os
 
+# Debugger
+# import pdb; pdb.set_trace()
+
 ###############################################################################################################
 ###############################################################################################################
 
@@ -96,6 +99,8 @@ class Hex:
 
     # Appends the passed ident to the given hex
    def take_ident(self, ident):
+       
+       assert (ident != None)
 
        if ident.state != -2:
             print("hex at " + str(self.matrix_index) + ", " + str(self.list_index) + " taking ident " + str(ident.serial_number))
@@ -359,7 +364,8 @@ class Hex:
             if check is None:
                 toMove = hex_matrix[neighbor.matrix_index][neighbor.list_index]
                 # get my neighboors, and my movable neighbors, and my wall neighbors
-                toMove.motion_handler(neighbor, toMove.get_neighbors(), toMove.check_movables(), toMove.check_walls(), (i.state - 3) % 6)
+                to_move_neighbors = toMove.get_neighbors()
+                toMove.motion_handler(neighbor, to_move_neighbors, toMove.check_movables(to_move_neighbors), toMove.check_walls(to_move_neighbors), (i.state - 3) % 6)
 
 
 
@@ -421,26 +427,51 @@ class Hex:
 
    # Handles case with six neighbors pointing at self
    # pointing_neighbors is a list of the relevant idents
-   def six_neighbors_case(self, pointing_neighbors):
+   def six_neighbors_cases(self, pointing_neighbors):
        future = hex_matrix_new[self.matrix_index][self.list_index]
+       
+       # Create a list of moving states stored in self
+       self_states = []
+       no_collision = [0, 1, 2, 3, 4, 5]
+       self_moving = False
+       for ident in self.idents:
+           if ident.state >= 0:
+               self_states.append(ident.state)
+               self_moving = True
+               no_collision.remove(ident.state)
 
-       for neighbor_ident in pointing_neighbors:
-           # All idents are turned around 180 degrees
-           Hex.flip_and_adopt_ident(neighbor_ident, 3, future)
+       if self_moving:        
+            # The moving ident(s) in self will collide with the opposite ident(s) approaching self
+            for state in self_states:
+                Hex.flip_and_adopt_ident(self.contains_direction(state), 3, future)
+
+            # All remaining incoming idents (stored in no_collision) must be handled accordingly
+            # TODO: Write these cases    
+
+
+       elif self.contains_direction(-1):
+           # TODO: What if self is both stationary and moving?
+           # TODO: What if some of the assosciated identities bounce off of identities in self?
+           self_ident = self.contains_direction(-1)
+           for i in range(6):
+               # TODO: This is an issue because transforms a single stationary hex into a bunch of moving hexes, and we have no way to undo that
+               # copy_ident = self_ident.copy()
+               # Hex.flip_and_adopt_ident(copy_ident, 1 + i, future) 
+
+               copy_ident = Ident(self_ident.color, i, property=self_ident.property)
+               future.take_ident(copy_ident)
+
+       else:  
+           # if self contains no states
+           for neighbor_ident in pointing_neighbors:
+                # All idents are turned around 180 degrees
+                Hex.flip_and_adopt_ident(neighbor_ident, 3, future)
 
 
    # Handles case with five neighbors pointing at self
    # pointing_neighbors is a list of the relevant idents
-   def five_neighbors_case(self, pointing_neighbors):
+   def five_neighbors_cases(self, pointing_neighbors, null_dir):
        future = hex_matrix_new[self.matrix_index][self.list_index]
-
-       # Identify which direction does not have an approaching ident
-       null_dir = -1
-       for i in range(len(pointing_neighbors)):
-           if not pointing_neighbors[i]:
-               null_dir = i
-               break
-       assert(null_dir != -1) 
       
        # Flip the four idents that have an opposite partner
        for i in range(len(pointing_neighbors)):
@@ -746,11 +777,20 @@ class Hex:
         if not self.contains_wall():
             if num_pointing_neighbors == 6:
                 # Case for 6 neighbors pointing at me
-                self.six_neighbors_case(my_neighbors_pointing_at_me)
+                self.six_neighbors_cases(my_neighbors_pointing_at_me)
             
             elif num_pointing_neighbors == 5:
+                # breakpoint()
+                # Identify which direction does not have an approaching ident
+                null_dir = -1
+                for i in range(len(my_neighbors_pointing_at_me)):
+                   if not my_neighbors_pointing_at_me[i]:
+                      null_dir = i
+                      break
+                assert(null_dir != -1) 
+
                 # Case for 5 neighbors pointing at me
-                self.five_neighbors_case(my_neighbors_pointing_at_me)
+                self.five_neighbors_cases(my_neighbors_pointing_at_me, null_dir)
 
 
             # TODO: write case for 4-hex collisions
