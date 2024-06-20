@@ -752,8 +752,11 @@ class Hex:
                 # Case for 5 neighbors pointing at me
                 self.five_neighbors_case(my_neighbors_pointing_at_me)
 
-# TODO: Maybe let 4-, 5-, and 6-hex collisions be handled in some other way? (rather than by passing direction)
+
+            # TODO: write case for 4-hex collisions
+            
             else:
+               # 1-, 2-, and 3-hex collisions are handled by the motion handler
                for i in range(6):
                    if my_neighbors[i] != None:
                        self.motion_handler(future, my_neighbors, neighbors_movable, neighbors_wall, i)
