@@ -436,10 +436,6 @@ class World:
 
     # Swaps which matrix is being used
     def __swap_matrices_and_lists(self):
-        # TODO: Janky pause
-        counter = 0
-        for i in range(10000):
-            counter += 1
 
         temp_matrix = self.hex_matrix
         self.hex_matrix = self.hex_matrix_new
@@ -453,6 +449,14 @@ class World:
 
     def __update(self):
 
+        # Clear idents from future matrix
+        for hex_list in self.hex_matrix_new:
+            for hex in hex_list:
+                hex.idents.clear()
+        
+        # Clear idents from future list
+        self.ident_list_new.clear()
+
         # Move or flip all idents
         for ident in self.ident_list:
             ident.advance_or_flip()
@@ -463,7 +467,7 @@ class World:
         
         # TODO: Have advance_or_flip write from original and new
         # TODO: Have repair_collisions write from new to original
-        #self.__swap_matrices_and_lists()
+        # self.__swap_matrices_and_lists()
     
     ##########################################################################################################
 
