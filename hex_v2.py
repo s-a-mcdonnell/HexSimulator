@@ -163,113 +163,72 @@ class Ident:
     
     ##########################################################################################################
 
-    # If the head-on (direction of self.state) neighboring hex contains an ident with the given direction, returns said ident
-    # else return None
-    def __neighbor_contains_direction(self, dir):
-        current_matrix = self.world.hex_matrix
-
-        if self.state == 0:
-
+    # Returns the neighboring hex in the given direction in the given matrix
+    # If that hex does not exist, returns None
+    def __get_neighbor(self, matrix, dir):
+        if dir == 0:
             try:
-                return current_matrix[self.matrix_index][self.list_index - 1].contains_direction(dir)
+                return matrix[self.matrix_index][self.list_index - 1]
             except:
-                # Neighbor 0 does not exist and is therefore not a wall
-                return None
-        
-        elif self.state == 1:
-            try:
-                return current_matrix[self.matrix_index + 1][self.list_index - 1].contains_direction(dir)  
-            except:
-                # Neighbor 1 does not exist and is therefore not a wall
-                return None
-
-        elif self.state == 2:
-            try:
-                return current_matrix[self.matrix_index + 1][self.list_index].contains_direction(dir)
-            except:
-                # Neighbor 2 does not exist and is therefore not a wall
-                return None
-
-        elif self.state == 3:
-
-            try:
-                return current_matrix[self.matrix_index][self.list_index + 1].contains_direction(dir)
-            except:
-                # Neighbor 3 does not exist and is therefore not a wall
-                return None
-
-        elif self.state == 4:
-
-            try:
-                return current_matrix[self.matrix_index - 1][self.list_index + 1].contains_direction(dir)
-            except:
-                # Neighbor 4 does not exist and is therefore not a wall
                 return None
             
-        elif self.state == 5:
+        elif dir == 1:
+            try:
+                return matrix[self.matrix_index + 1][self.list_index - 1]  
+            except:
+                return None
+
+        elif dir == 2:
+            try:
+                return matrix[self.matrix_index + 1][self.list_index]
+            except:
+                return None
+
+        elif dir == 3:
 
             try:
-                return current_matrix[self.matrix_index - 1][self.list_index].contains_direction(dir)
+                return matrix[self.matrix_index][self.list_index + 1]
             except:
-                # Neighbor 5 does not exist and is therefore not a wall
+                return None
+
+        elif dir == 4:
+
+            try:
+                return matrix[self.matrix_index - 1][self.list_index + 1]
+            except:
+                return None
+            
+        elif dir == 5:
+
+            try:
+                return matrix[self.matrix_index - 1][self.list_index]
+            except:
                 return None
             
         else:
-            print("Ident.__neighbor_contains_direction(" + str(dir) + ") called on non-moving hex")
+            print("Invalid direction " + str(dir) + " passed to Ident.__get_neighbor(dir)")
             return None
+
+
+
+
+    ##########################################################################################################
+
+
+    # If the head-on (direction of self.state) neighboring hex contains an ident with the given direction, returns said ident
+    # Else returns None
+    # TODO: Does this method still have a purpose?
+    def __neighbor_contains_direction(self, dir):
+
+        return self.__get_neighbor(self.world.hex_matrix, self.state).contains_direction(dir)
+
+    ##########################################################################################################
 
 
     # If the neighbor in the direction in which the ident is pointing is a wall, returns that ident
     # Else returns None
     def __neighbor_is_wall(self):
         return self.__neighbor_contains_direction(-2)
-        '''current_matrix = self.world.hex_matrix
-
-        if self.state == 0:
-
-            try:
-                return current_matrix[self.matrix_index][self.list_index - 1].contains_direction(-2)
-            except:
-                # Neighbor 0 does not exist and is therefore not a wall
-                return None
-        
-        elif self.state == 1:
-            try:
-                return current_matrix[self.matrix_index + 1][self.list_index - 1].contains_direction(-2)  
-            except:
-                # Neighbor 1 does not exist and is therefore not a wall
-                return None
-
-        elif self.state == 2:
-            try:
-                return current_matrix[self.matrix_index + 1][self.list_index].contains_direction(-2)
-            except:
-                # Neighbor 2 does not exist and is therefore not a wall
-                return None
-
-        elif self.state == 3:
-
-            try:
-                return current_matrix[self.matrix_index][self.list_index + 1].contains_direction(-2)
-            except:
-                # Neighbor 3 does not exist and is therefore not a wall
-                return None
-
-        elif self.state == 4:
-
-            try:
-                return current_matrix[self.matrix_index - 1][self.list_index + 1].contains_direction(-2)
-            except:
-                # Neighbor 4 does not exist and is therefore not a wall
-                return None
-            
-        elif self.state == 5:
-
-            try:
-                return current_matrix[self.matrix_index - 1][self.list_index].contains_direction(-2)
-            except:
-                # Neighbor 5 does not exist and is therefore not a wall
-                return None'''
         
     ##########################################################################################################
 
@@ -282,8 +241,9 @@ class Ident:
 
     ##########################################################################################################
 
-    # TODO: Write this method
-    # Writes to hex_matrix_new
+    # If an ident is stationary or a wall, writes this value to the hex_matrix_new
+    # Elif an ident is running into a wall or a head-on collision, flips it in place (writing to hex_matrix_new)
+    # Else advances an ident by one hex in its direction of motion (if that hex exists)
     def advance_or_flip(self):
         future_matrix = self.world.hex_matrix_new
         future_hex = future_matrix[self.matrix_index][self.list_index]
@@ -315,10 +275,12 @@ class Ident:
             
             return
 
-
-        # TODO: Advance all others
-
-        pass
+        # Advance all others (if the location where they would advance to exists)
+        future_neighbor = self.__get_neighbor(future_matrix, self.state)
+        if future_neighbor:
+            # TODO: Append self or self.copy()?
+            future_list.append(self)
+            future_neighbor.idents.append(self)
 
     ##########################################################################################################
 
@@ -474,6 +436,11 @@ class World:
 
     # Swaps which matrix is being used
     def __swap_matrices_and_lists(self):
+        # TODO: Janky pause
+        counter = 0
+        for i in range(10000):
+            counter += 1
+
         temp_matrix = self.hex_matrix
         self.hex_matrix = self.hex_matrix_new
         self.hex_matrix_new = temp_matrix
@@ -485,7 +452,6 @@ class World:
     ##########################################################################################################
 
     def __update(self):
-        # TODO: Note that this (calling swap_matrices) will just cause flashing until these two methods are written
 
         # Move or flip all idents
         for ident in self.ident_list:
@@ -497,7 +463,7 @@ class World:
         
         # TODO: Have advance_or_flip write from original and new
         # TODO: Have repair_collisions write from new to original
-        # self.__swap_matrices_and_lists()
+        #self.__swap_matrices_and_lists()
     
     ##########################################################################################################
 

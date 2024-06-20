@@ -1,2 +1,2 @@
-5 7 move GREEN 3
-5 8 move BLUE 0
+5 5 move GREEN 3
+5 10 move BLUE 0
