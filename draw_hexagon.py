@@ -290,6 +290,26 @@ class Hex:
         
         return my_neighbors
 
+   # Takes an array of neighboring hexes
+   # Returns an array of idents pointing at self
+   def get_neighbors_pointing_at_me(self, neighbors):
+       idents_pointing_at_me = []
+
+       for i in range(len(neighbors)):
+           neighbor_ident = None
+           
+           # Avoid trying to call contains_direction on a None object
+           if neighbors[i]:
+               neighbor_ident = neighbors[i].contains_direction((i+3)%6)
+            
+           if neighbor_ident:
+               # TODO: What if the neighbor contains multiple idents pointing at me?
+               idents_pointing_at_me.append(neighbor_ident)
+           else:
+               idents_pointing_at_me.append(None)
+
+       return idents_pointing_at_me         
+
    # removes influence of this hex from neighbors
    def cleanse_neighbor(self, direction):
         if (direction == 0):
@@ -385,6 +405,17 @@ class Hex:
                 if(future.contains_direction(-1) is None):
                     future.take_ident(ident_to_stop)
                     print("Took ident " + str(ident_to_stop.color) + " " + str(ident_to_stop.state))
+
+   # Handles case with six neighbors pointing at self
+   def six_neighbors_case(self, pointing_neighbors):
+       future = hex_matrix_new[self.matrix_index][self.list_index]
+
+       for neighbor_ident in pointing_neighbors:
+           # All idents are turned around 180 degrees
+           ident_to_flip = neighbor_ident.copy()
+           ident_to_flip.state = (ident_to_flip.state + 3)%6
+           future.take_ident(ident_to_flip)
+           
 
     ##########################################################################################################
 
@@ -657,18 +688,29 @@ class Hex:
 
         my_neighbors = self.get_neighbors()
 
+        my_neighbors_pointing_at_me = self.get_neighbors_pointing_at_me(my_neighbors)
+        # Count number of neighbors pointing at me
+        num_pointing_neighbors = 0
+        for nbr in my_neighbors_pointing_at_me:
+            if nbr:
+                num_pointing_neighbors += 1 
+
         neighbors_movable = self.check_movables(my_neighbors)
         neighbors_wall = self.check_walls(my_neighbors)
         
         # TODO: Convert if self.movable: to ident
         # If the hex does not contains a wall
         if not self.contains_wall():
-            # TODO: Adjust to account for idents
+            if num_pointing_neighbors == 6:
+                # Case for 6 neighbors pointing at me
+                self.six_neighbors_case(my_neighbors_pointing_at_me)
+
 
 # TODO: Maybe let 4-, 5-, and 6-hex collisions be handled in some other way? (rather than by passing direction)
-            for i in range(6):
-                if my_neighbors[i] != None:
-                    self.motion_handler(future, my_neighbors, neighbors_movable, neighbors_wall, i)
+            else:
+               for i in range(6):
+                   if my_neighbors[i] != None:
+                       self.motion_handler(future, my_neighbors, neighbors_movable, neighbors_wall, i)
 
         # If the hex is currently occupied and not moving, it will still be occupied in the next generation
         # If that hasn't already been seen to by the motion handler, that must mean that the hex is occupied and stationary in the next generation
