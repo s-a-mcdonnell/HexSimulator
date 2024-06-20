@@ -15,15 +15,12 @@ Process of the game:
 
 # hex class is now just for graphics/displaying the board/storing idents
 class Hex:
-    # Default color (no idents): light blue
-    DEFAULT_COLOR =(190, 240, 255)
-
     ###############################################################################################################
 
     # Takes x and y (Cartesian coordinates where (0, 0) is the top left corner)
     # Returns a list of 6 coordinates defining a hexagon
     @staticmethod
-    def __create_coor(x, y):
+    def create_coor(x, y):
         # Making hex smaller so that borders will be visible
         return [(x+3, y+3), (x+37, y+3), (x+57, y+35), (x+37, y+67), (x+3, y+67), (x-17, y+35)]
 
@@ -41,8 +38,10 @@ class Hex:
         self.x = 60*matrix_index - 20
         self.y = 35*matrix_index + 70*list_index - 490
 
-        self.coordinates = Hex.__create_coor(self.x, self.y)
+        self.coordinates = Hex.create_coor(self.x, self.y)
 
+        # Default color (no idents): light blue
+        self.color =(190, 240, 255)
        
         # TODO: Move arrows and smaller hexagon to idents? (maybe)
         # Create arrows for later use
@@ -57,6 +56,7 @@ class Hex:
     
         # Coordinates used to draw smaller hexagon later if the hex becomes stationary
         self.small_hexagon = [(self.x+9, self.y+11), (self.x+31, self.y+11), (self.x+47, self.y+35), (self.x+31, self.y+59), (self.x+9, self.y+59), (self.x-7, self.y+35)]
+
     ##########################################################################################################
 
     # Returns a boolean indicating if the given hex contains any moving idents
@@ -80,13 +80,27 @@ class Hex:
                 return ident
 
         return None
+    
 
     ##########################################################################################################
 
-    # Graphics (drawing hexes and the corresponding idents)
+    # Checks where a specific ident occurs within this hex's list
+    # If it contains the ident, returns the index
+    # Else returns -1
+    def get_ident_index(self, to_find):
+
+        # TODO: What if the hex contains multiple idents with that state?
+        for i in range(len(self.idents)):
+            if self.idents[i] == to_find:
+                return i
+        return -1
+
+    ##########################################################################################################
+
+    # Graphics
     def draw(self, screen):
             
-        color_to_draw = Hex.DEFAULT_COLOR
+        color_to_draw = self.color
 
 
         if (len(self.idents) >= 1):
@@ -120,7 +134,6 @@ class Hex:
 # for storing information about a particular moving hex
 class Ident:
 
-    # TODO: Do we still need this?
     idents_created = 0
 
     ##########################################################################################################
@@ -153,42 +166,21 @@ class Ident:
         self.list_index = list_index
     
     # TODO: Write this method
-    # Writes to hex_matrix_new
     def advance_or_flip(self):
-        global hex_matrix_new
-
-        # Maintain walls and stationaries and return
-
-        # If need to bounce (wall or head-on), then bounce and return
-
-        # Advance all others
-
         pass
-
-    ##########################################################################################################
 
     # TODO: Write this method
-    # Write from hex_matrix_new to hex_matrix
-    def repair_collisions(self):
+    def repair_collisions(self, hex_matrix):
 
-        pass
+        # obtain the hex that this ident is a part of
+        hex = hex_matrix[self.matrix_index][self.list_index]
+        if len(hex.idents) <= 1:
+            print("No collision to resolve")
+            return
+        
+        # now we have determined that the ident has other idents with it
+        my_index = hex.
 
-    def visited(self, m, l):
-        # push onto stack history
-        # pushed onto the history is
-            # hex matix index
-            # hex list index
-            # current state
-
-        # note, we want to keep up to 5 past states at a time
-        # to change amount, just change limit #
-        limit = 5
-
-        if len(self.hist) == limit + 1:
-            self.hist.pop(0)
-            self.hist.append((m, l, self.state))
-        else:
-            self.hist.append((m, l, self.state))
 
 ###############################################################################################################
 
@@ -218,36 +210,21 @@ class World:
             for y in range(16):
                 myHex = Hex(x, y)
                 hex_list.append(myHex)
-        
-        # Set up new hex matrix
-        self.hex_matrix_new = []
-
-        for x in range(15):
-            hex_list_new = []
-            self.hex_matrix_new.append(hex_list_new)
-
-            for y in range(16):
-                myHex = Hex(x, y)
-                hex_list_new.append(myHex)
 
         # Set up ident list
         self.ident_list = []
 
-        # Set up new ident list
-        self.ident_list_new = []
 
         # reading the intiial state of the hex board from a file
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         file = open(os.path.join(__location__, "initial_state.txt"), "r")
         for line in file:
-            self.__read_line(line)
-            # pass
-            # TODO: uncomment the above line for proper fie reading once we implement moving, stationary, wall hexes back into the program
+            self.read_line(line)
 
     ##########################################################################################################
 
     @classmethod
-    def __get_color(self, color_text):
+    def get_color(self, color_text):
         if color_text == "YELLOW" or color_text == "YELLOW\n":
             return (255, 255, 102)
         elif color_text == "PURPLE" or color_text == "PURPLE\n":
@@ -271,7 +248,7 @@ class World:
 
     ##########################################################################################################
 
-    def __read_line(self, line):
+    def read_line(self, line):
         # actual parsing of the text file
         line_parts = line.split(" ")
         
@@ -282,7 +259,7 @@ class World:
         if command == "move":
             direction = int(line_parts[4])
             color_text = line_parts[3]
-            color = World.__get_color(color_text)
+            color = World.get_color(color_text)
             new_ident = Ident(matrix_index, list_index, color = color, state = direction)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
@@ -290,7 +267,7 @@ class World:
             # self.hex_matrix[matrix_index][list_index].make_move(direction, color)
         elif command == "occupied":
             color_text = line_parts[3]
-            color = World.__get_color(color_text)
+            color = World.get_color(color_text)
             new_ident = Ident(matrix_index, list_index, color = color)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
@@ -305,44 +282,35 @@ class World:
 
     ##########################################################################################################
 
-    # Draws world
-    def __draw(self):
+    def draw(self):
         # Reset screen
         self.screen.fill((0, 0, 0))
 
-        # Draw all hexes with idents
+        # Draw all blank hexes
         for hex_list in self.hex_matrix:
             for hex in hex_list:
                 hex.draw(self.screen)
 
-    ##########################################################################################################
-
-    # Swaps which matrix is being used
-    def __swap_matrices_and_lists(self):
-        temp_matrix = self.hex_matrix
-        self.hex_matrix = self.hex_matrix_new
-        self.hex_matrix_new = temp_matrix
-
-        temp_list = self.ident_list
-        self.ident_list = self.ident_list_new
-        self.ident_list_new = temp_list
+        # TODO: Draw all idents
+        '''for ident in self.ident_list:
+            # TODO: Write Ident.draw()
+            ident.draw()'''
 
     ##########################################################################################################
 
-    def __update(self):
-        # TODO: Note that this (calling swap_matrices) will just cause flashing until these two methods are written
+
+    def update(self):
 
         # Move or flip all idents
         for ident in self.ident_list:
             ident.advance_or_flip()
                 
         # Fix collisions
-        for ident in self.ident_list_new:
-            ident.repair_collisions()
-        
-        # TODO: Have advance_or_flip write from original and new
-        # TODO: Have repair_collisions write from new to original
-        # self.__swap_matrices_and_lists()
+        for hex_list in self.hex_matrix:
+            for hex in hex_list:
+                hex.repair_collisions()
+
+        # TODO: Write this method, iterating through idents
     
     ##########################################################################################################
 
@@ -355,12 +323,12 @@ class World:
                 if event.type == pygame.QUIT:
                     run = False
             
-            self.__draw()
+            self.draw()
 
             # flips to the next frame
             pygame.display.flip()
             
-            self.__update()
+            self.update()
         
         # Exit
         pygame.quit()
