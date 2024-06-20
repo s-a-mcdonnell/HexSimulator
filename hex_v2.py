@@ -125,7 +125,7 @@ class Ident:
 
     ##########################################################################################################
 
-    def __init__(self, matrix_index, list_index, color=(255, 255, 255), state = -1, serial_number = -1, hist = None):
+    def __init__(self, matrix_index, list_index, world, color=(255, 255, 255), state = -1, serial_number = -1, hist = None):
         if hist is None:
             hist = []
         self.color = color
@@ -151,17 +151,172 @@ class Ident:
 
         self.matrix_index = matrix_index
         self.list_index = list_index
+
+        self.world = world
+
+    ##########################################################################################################
+
+    def __copy(self):
+        # TODO: Should a copy of self.hist be passed?
+        new_copy = Ident(self.matrix_index, self.list_index, self.world, self.color, self.state, self.serial_number, self.hist)
+        return new_copy
     
+    ##########################################################################################################
+
+    # If the head-on (direction of self.state) neighboring hex contains an ident with the given direction, returns said ident
+    # else return None
+    def __neighbor_contains_direction(self, dir):
+        current_matrix = self.world.hex_matrix
+
+        if self.state == 0:
+
+            try:
+                return current_matrix[self.matrix_index][self.list_index - 1].contains_direction(dir)
+            except:
+                # Neighbor 0 does not exist and is therefore not a wall
+                return None
+        
+        elif self.state == 1:
+            try:
+                return current_matrix[self.matrix_index + 1][self.list_index - 1].contains_direction(dir)  
+            except:
+                # Neighbor 1 does not exist and is therefore not a wall
+                return None
+
+        elif self.state == 2:
+            try:
+                return current_matrix[self.matrix_index + 1][self.list_index].contains_direction(dir)
+            except:
+                # Neighbor 2 does not exist and is therefore not a wall
+                return None
+
+        elif self.state == 3:
+
+            try:
+                return current_matrix[self.matrix_index][self.list_index + 1].contains_direction(dir)
+            except:
+                # Neighbor 3 does not exist and is therefore not a wall
+                return None
+
+        elif self.state == 4:
+
+            try:
+                return current_matrix[self.matrix_index - 1][self.list_index + 1].contains_direction(dir)
+            except:
+                # Neighbor 4 does not exist and is therefore not a wall
+                return None
+            
+        elif self.state == 5:
+
+            try:
+                return current_matrix[self.matrix_index - 1][self.list_index].contains_direction(dir)
+            except:
+                # Neighbor 5 does not exist and is therefore not a wall
+                return None
+            
+        else:
+            print("Ident.__neighbor_contains_direction(" + str(dir) + ") called on non-moving hex")
+            return None
+
+
+    # If the neighbor in the direction in which the ident is pointing is a wall, returns that ident
+    # Else returns None
+    def __neighbor_is_wall(self):
+        return self.__neighbor_contains_direction(-2)
+        '''current_matrix = self.world.hex_matrix
+
+        if self.state == 0:
+
+            try:
+                return current_matrix[self.matrix_index][self.list_index - 1].contains_direction(-2)
+            except:
+                # Neighbor 0 does not exist and is therefore not a wall
+                return None
+        
+        elif self.state == 1:
+            try:
+                return current_matrix[self.matrix_index + 1][self.list_index - 1].contains_direction(-2)  
+            except:
+                # Neighbor 1 does not exist and is therefore not a wall
+                return None
+
+        elif self.state == 2:
+            try:
+                return current_matrix[self.matrix_index + 1][self.list_index].contains_direction(-2)
+            except:
+                # Neighbor 2 does not exist and is therefore not a wall
+                return None
+
+        elif self.state == 3:
+
+            try:
+                return current_matrix[self.matrix_index][self.list_index + 1].contains_direction(-2)
+            except:
+                # Neighbor 3 does not exist and is therefore not a wall
+                return None
+
+        elif self.state == 4:
+
+            try:
+                return current_matrix[self.matrix_index - 1][self.list_index + 1].contains_direction(-2)
+            except:
+                # Neighbor 4 does not exist and is therefore not a wall
+                return None
+            
+        elif self.state == 5:
+
+            try:
+                return current_matrix[self.matrix_index - 1][self.list_index].contains_direction(-2)
+            except:
+                # Neighbor 5 does not exist and is therefore not a wall
+                return None'''
+        
+    ##########################################################################################################
+
+    # If there will be a head-on-collision, returns the ident with which it will collide
+    # Else returns none
+    # TODO: Could just use a boolean
+    def __head_on_collision(self):
+        return self.__neighbor_contains_direction((self.state + 3)%6)
+
+
+    ##########################################################################################################
+
     # TODO: Write this method
     # Writes to hex_matrix_new
     def advance_or_flip(self):
-        global hex_matrix_new
-
+        future_matrix = self.world.hex_matrix_new
+        future_hex = future_matrix[self.matrix_index][self.list_index]
+        future_list = self.world.ident_list_new
+    
         # Maintain walls and stationaries and return
+        if (self.state == -2) or (self.state == -1):
+            future_list.append(self.__copy())
+            future_hex.idents.append(self.__copy())
+
+            return
 
         # If need to bounce (wall or head-on), then bounce and return
+        if self.__neighbor_is_wall():
+            # TODO: Reintroduce flip and append method?
+            copy_to_flip = self.__copy()
+            copy_to_flip.state = (copy_to_flip.state + 3)%6
+            future_list.append(copy_to_flip)
+            future_hex.idents.append(copy_to_flip)
+            
+            return
+        
+        if self.__head_on_collision():
+            # TODO: Reintroduce flip and append method?
+            copy_to_flip = self.__copy()
+            copy_to_flip.state = (copy_to_flip.state + 3)%6
+            future_list.append(copy_to_flip)
+            future_hex.idents.append(copy_to_flip)
+            
+            return
 
-        # Advance all others
+
+        # TODO: Advance all others
 
         pass
 
@@ -283,7 +438,7 @@ class World:
             direction = int(line_parts[4])
             color_text = line_parts[3]
             color = World.__get_color(color_text)
-            new_ident = Ident(matrix_index, list_index, color = color, state = direction)
+            new_ident = Ident(matrix_index, list_index, self, color = color, state = direction)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_ident)
@@ -291,13 +446,13 @@ class World:
         elif command == "occupied":
             color_text = line_parts[3]
             color = World.__get_color(color_text)
-            new_ident = Ident(matrix_index, list_index, color = color)
+            new_ident = Ident(matrix_index, list_index, self, color = color)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_ident)
             # self.hex_matrix[matrix_index][list_index].make_occupied(color)
         elif command == "wall" or command == "wall\n":
-            new_ident = Ident(matrix_index, list_index, color = (0,0,0), state = -2)
+            new_ident = Ident(matrix_index, list_index, self, color = (0,0,0), state = -2)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_ident)
