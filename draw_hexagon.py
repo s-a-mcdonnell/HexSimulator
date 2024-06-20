@@ -372,21 +372,26 @@ class Hex:
             print("hit neighbor case 1, dir = " + str(dir))
             print("self color " + str(self.contains_direction(dir).color))
             print("self location (" + str(self.matrix_index) + ", " + str(self.list_index) + ")")
-            ident_to_rotate = self.contains_direction(dir).copy()
+            
+            Hex.flip_and_adopt_ident(self.contains_direction(dir), 1, future)
+            '''ident_to_rotate = self.contains_direction(dir).copy()
             ident_to_rotate.state = (dir+1)%6
-            future.take_ident(ident_to_rotate)
+            future.take_ident(ident_to_rotate)'''
         elif (neighbors_wall[(dir+1)%6] == 1) and not (neighbors_wall[(dir-1)%6] == 1):
             print("hit neighbor case 2, dir = " + str(dir))
-            ident_to_rotate = self.contains_direction(dir).copy()
+            Hex.flip_and_adopt_ident(self.contains_direction(dir), -1, future)
+            '''ident_to_rotate = self.contains_direction(dir).copy()
             ident_to_rotate.state = (dir-1)%6
-            future.take_ident(ident_to_rotate)
+            future.take_ident(ident_to_rotate)'''
 
         # if my neighbor is a wall (or if I have two neighors to the side in front), bounce off
         elif (neighbors_wall[dir] == 1) or ((neighbors_wall[(dir-1)%6] == 1) and (neighbors_wall[(dir+1)%6] == 1)):
             print("hit neighbor case 3, dir = " + str(dir))
-            ident_to_rotate = self.contains_direction(dir).copy()
+            
+            Hex.flip_and_adopt_ident(self.contains_direction(dir), 3, future)
+            '''ident_to_rotate = self.contains_direction(dir).copy()
             ident_to_rotate.state = (dir+3)%6
-            future.take_ident(ident_to_rotate)
+            future.take_ident(ident_to_rotate)'''
             
         
         # if I am moving toward my neighbor, and my neighbor is occupied but not moving, then I become occupied but not moving
@@ -406,6 +411,14 @@ class Hex:
                     future.take_ident(ident_to_stop)
                     print("Took ident " + str(ident_to_stop.color) + " " + str(ident_to_stop.state))
 
+   # Copies and rotates the passed ident by the given number of rotations and has future take that ident
+   # TODO: Check that this substitution works with test cases
+   @staticmethod
+   def flip_and_adopt_ident(ident_to_flip, num_iterate, future):
+       ident_to_adopt = ident_to_flip.copy()
+       ident_to_adopt.state = (ident_to_adopt.state + num_iterate)%6
+       future.take_ident(ident_to_adopt)
+
    # Handles case with six neighbors pointing at self
    # pointing_neighbors is a list of the relevant idents
    def six_neighbors_case(self, pointing_neighbors):
@@ -413,9 +426,7 @@ class Hex:
 
        for neighbor_ident in pointing_neighbors:
            # All idents are turned around 180 degrees
-           ident_to_flip = neighbor_ident.copy()
-           ident_to_flip.state = (ident_to_flip.state + 3)%6
-           future.take_ident(ident_to_flip)
+           Hex.flip_and_adopt_ident(neighbor_ident, 3, future)
 
 
    # Handles case with five neighbors pointing at self
@@ -434,9 +445,7 @@ class Hex:
        # Flip the four idents that have an opposite partner
        for i in range(len(pointing_neighbors)):
            if (i != null_dir) and (i != (null_dir+3)%6):
-               ident_to_flip = pointing_neighbors[i].copy()
-               ident_to_flip.state = (ident_to_flip.state + 3)%6
-               future.take_ident(ident_to_flip)
+               Hex.flip_and_adopt_ident(pointing_neighbors[i], 3, future)
 
        # Let the other ident pass through
        # TODO: Check if this is really how we want the physics to work
@@ -570,9 +579,10 @@ class Hex:
                 if my_ident != None:
                     # If in a head-on collision with a neighbor moving in the opposite direction, maintain identity and switch direction
                     print("case 1")
-                    ident_to_flip = my_ident.copy()
+                    Hex.flip_and_adopt_ident(my_ident, 3, future)
+                    '''ident_to_flip = my_ident.copy()
                     ident_to_flip.state = (ident_to_flip.state+3)%6
-                    future.take_ident(ident_to_flip)
+                    future.take_ident(ident_to_flip)'''
                 elif counterclockwise_neighbor_ident != None and clockwise_neighbor_ident != None:
                     # If three arrows are approaching at 60 degree angles and I am in the middle, I go straight
                     # TODO: The prioritization of 3-hex collisions over 2-hex collisions makes it difficult/unclear how to implement 4 hexes
@@ -589,9 +599,10 @@ class Hex:
                         future.take_ident(neighbor_ident)
                     else:
                         # Bounce
-                        ident_to_flip = clockwise_step_ident.copy()
+                        Hex.flip_and_adopt_ident(clockwise_step_ident, -2, future)
+                        '''ident_to_flip = clockwise_step_ident.copy()
                         ident_to_flip.state = (ident_to_flip.state-2)%6
-                        future.take_ident(ident_to_flip)
+                        future.take_ident(ident_to_flip)'''
                         if self.contains_direction(-1) is not None:
                             future.idents.insert(0, ident_to_take)
 
@@ -604,9 +615,10 @@ class Hex:
                         print("case 5 alt")
                         future.take_ident(neighbor_ident)
                     else:
-                        ident_to_flip = counterclockwise_step_ident.copy()
+                        Hex.flip_and_adopt_ident(counterclockwise_step_ident, 2, future)
+                        '''ident_to_flip = counterclockwise_step_ident.copy()
                         ident_to_flip.state = (ident_to_flip.state+2)%6
-                        future.take_ident(ident_to_flip)
+                        future.take_ident(ident_to_flip)'''
                         if self.contains_direction(-1) is not None:
                             future.idents.insert(0, ident_to_take)
                 
@@ -624,14 +636,16 @@ class Hex:
                         future.take_ident(neighbor_ident)
                     elif opp_neighbor_ident != None:
                         # If our direct neighbor will be colliding in a 120 degree collision (and thus not colliding with us), rotate
-                        ident_to_rotate = neighbor_ident.copy()
+                        Hex.flip_and_adopt_ident(neighbor_ident, 2, future)
+                        '''ident_to_rotate = neighbor_ident.copy()
                         ident_to_rotate.state = (ident_to_rotate.state + 2)%6
-                        future.take_ident(ident_to_rotate)
+                        future.take_ident(ident_to_rotate)'''
                     else:
                         # Bounce
-                        ident_to_flip = clockwise_neighbor_ident.copy()
+                        Hex.flip_and_adopt_ident(clockwise_neighbor_ident, -1, future)
+                        '''ident_to_flip = clockwise_neighbor_ident.copy()
                         ident_to_flip.state = (ident_to_flip.state-1)%6
-                        future.take_ident(ident_to_flip)
+                        future.take_ident(ident_to_flip)'''
                         if self.contains_direction(-1) is not None:
                             future.take_ident(ident_to_take)
                 elif counterclockwise_neighbor_ident != None:
@@ -644,16 +658,19 @@ class Hex:
                         future.take_ident(neighbor_ident)
                     elif opp_neighbor_ident != None:
                         # If our direct neighbor will be colliding in a 120 degree collision (and thus not colliding with us), rotate
-                        ident_to_rotate = neighbor_ident.copy()
+                        Hex.flip_and_adopt_ident(neighbor_ident, -2, future)
+                        '''ident_to_rotate = neighbor_ident.copy()
                         ident_to_rotate.state = (ident_to_rotate.state - 2)%6
-                        future.take_ident(ident_to_rotate)
+                        future.take_ident(ident_to_rotate)'''
                     else:
                         # Bounce
+                        Hex.flip_and_adopt_ident(counterclockwise_neighbor_ident, 1, future)
+                        # TODO: Delete ident_to_flip when deleting debugging statement
                         ident_to_flip = counterclockwise_neighbor_ident.copy()
                         print("I am hex (" + str(self.matrix_index) + ", " + str(self.list_index) + ")")
                         print("flipping ident with color " + str(ident_to_flip.color) + ", original direction " + str(ident_to_flip.state))
-                        ident_to_flip.state = (ident_to_flip.state+1)%6
-                        future.take_ident(ident_to_flip)
+                        # ident_to_flip.state = (ident_to_flip.state+1)%6
+                        # future.take_ident(ident_to_flip)
                         if self.contains_direction(-1) is not None:
                             future.take_ident(ident_to_take)
 
@@ -670,7 +687,7 @@ class Hex:
                     # If I am currently stationary and none of the previous statements have been triggered, I will be bumped
                     # TODO: Check that the descriptive comment is accurate
                     # TODO: What is there's superimposition on a portal?
-                    
+    
                     ident_to_edit = self.contains_direction(-1).copy()
                     ident_to_edit.state = (dir+3)%6
                     future.take_ident(ident_to_edit)
