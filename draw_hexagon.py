@@ -1021,8 +1021,11 @@ while (run) and (not goalEnd):
 
 if(goalEnd):
     print("SIM OVER, WE HIT GOAL")
-    screen.fill((255, 255, 255))
+    screen.fill((0, 0, 0))
     # TODO: insert info page here
+    print()
+    print("It took " + str(frames_created) + " frames to get into the goal.")
+    # something about where the goal was located (matrix coords) and which hex went into it? (ident/color)
     # pretty drawing here
     pygame.display.update()
     while(goalEnd):
