@@ -322,9 +322,34 @@ class Ident:
 
     ##########################################################################################################
 
+    # Repairs the given ident's direction in the context of the idents in its hex
     # TODO: Write this method
     # Write from hex_matrix_new to hex_matrix
-    def repair_collisions(self):
+    def repair_collisions(self, my_hex):
+        list_to_write_to = self.world.ident_list
+        hex_to_write_to = self.world.hex_matrix[self.matrix_index][self.list_index]
+
+
+        # If it has an ident opposite to it, flip and return
+        if my_hex.contains_direction((self.state + 3)%6):
+            # TODO: Use flipper and appender?
+            ident_to_flip = self.__copy()
+            ident_to_flip.state = (ident_to_flip.state + 3)%6
+            
+            list_to_write_to.append(ident_to_flip)
+            hex_to_write_to.idents.append(ident_to_flip)
+
+            return
+
+        # Todo: write cases
+
+        # If there are 7 idents
+
+        # If there are 6 idents
+
+        # If there are 5 idents
+
+        # Etc
 
         pass
 
@@ -488,6 +513,19 @@ class World:
         for hex_list in self.hex_matrix:
             for hex in hex_list:
                 hex.draw(self.screen)
+  
+    ##########################################################################################################
+
+    # Returns a set of occupied non_wall hexes, drawing from self.ident_list_new and self.hex_matrix_new
+    def get_hex_set(self):
+        active_hexes = {}
+
+        for ident in self.ident_list_new:
+            hex = self.hex_matrix_new[ident.matrix_index][ident.list_index]
+
+            active_hexes.add(hex)
+        
+        return active_hexes
 
     ##########################################################################################################
 
@@ -518,14 +556,32 @@ class World:
         for ident in self.ident_list:
             ident.advance_or_flip()
 
+        '''# Get a set of occupied non-wall hexes
+        # TODO: I don't think this is necessary, but it works well for my brain
+        active_hex_set = self.get_hex_set()
+
         # TODO: Comment this back in when Ident.repair_collisions() is written     
-        '''# Fix collisions
-        for ident in self.ident_list_new:
-            ident.repair_collisions()'''
+        # Fix collisions
+        for hex in active_hex_set
+            hex.repair_collisions()'''
         
-        # TODO: Comment this back out when Ident.repair_collisions() is written
+        # Clear idents from current matrix
+        for hex_list in self.hex_matrix:
+            for hex in hex_list:
+                hex.idents.clear()
+        
+        # Clear idents from current list
+        self.ident_list.clear()
+        
+        for ident in self.ident_list_new:
+            # TODO: Delete this
+            # idents_in_hex = self.hex_matrix_new[ident.matrix_index][ident.list_index].idents
+
+            ident.repair_collisions(self.hex_matrix_new[ident.matrix_index][ident.list_index])
+        
+        '''# TODO: Comment this back out when Ident.repair_collisions() is written
         #    (advance_or_flip writes from hex_matrix to hex_matrix_new, and repair_collisions can write from hex_matrix_new to hew_matrix)
-        self.__swap_matrices_and_lists()
+        self.__swap_matrices_and_lists()'''
     
     ##########################################################################################################
 
