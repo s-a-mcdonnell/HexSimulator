@@ -172,12 +172,7 @@ class Ident:
         # TODO: Review copy method
         new_copy = Ident(self.matrix_index, self.list_index, self.world, self.color, self.state, self.serial_number, self.hist)
         return new_copy
-    
-    # returns new coordinates in a list for the ident to go based on a direction passed in
-    def get_new_pos(self, dir):
-        to_return = [self.matrix_index, self.list_index]
 
-        return to_return
     
     # TODO: Write this method
     def advance_or_flip(self):
@@ -197,6 +192,7 @@ class Ident:
         
         # now we have determined that the ident has other idents with it
         my_index = hex.get_ident_index(self)
+        dir = self.state
 
         directions = []
 
@@ -212,12 +208,41 @@ class Ident:
             # additionally, move it forward depending on the direction
             # if the other hex was stationary, do not move it forward at all, keep it in place
             w.ident_list_new.append(to_become)
+            w.hex_matrix_new[self.matrix_index][self.list_index].idents.append(to_become)
         # if there is more than one other ident than self, we do averaging things
+        # if the idents contain an opposite direction ident, we bounce!! :)
+        elif hex.contains_direction((dir + 3) % 6) is not None:
+            to_become = self.copy()
+            to_become.state = (self.state + 3) % 6
+            w.ident_list_new.append(to_become)
+            w.hex_matrix_new[self.matrix_index][self.list_index].idents.append(to_become)
+        # otherwise, determine whether we contain a stationary hex or not
+        # if not, we are all moving hexes and none of them are opposite me, so we average them
+        elif hex.contains_direction(-1) is None:
+            # if we contain opposite pairs, remove them from the directions list
+            if (hex.contains_direction(dir + 1) is not None) and (hex.contains_direction(dir - 2) is not None):
+                directions.remove(hex.contains_direction(dir + 1))
+                directions.remove(hex.contains_direction(dir - 2))
+            if (hex.contains_direction(dir + 2) is not None) and (hex.contains_direction(dir - 1) is not None):
+                directions.remove(hex.contains_direction(dir + 2))
+                directions.remove(hex.contains_direction(dir - 1))
+            # if, at this point, there is only one direction left, take that one
+            if len(directions == 1):
+                to_become = self.copy()
+                to_become.state = directions[0].state
+                w.ident_list_new.append(to_become)
+                w.hex_matrix_new[self.matrix_index][self.list_index].idents.append(to_become)
+            # otherwise, we ended up with a net zero average and use the opposite of our own direction to break ties
+            elif len(directions == 0):
+                to_become = self.copy()
+                to_become.state = (dir - 3) %  6
+                w.ident_list_new.append(to_become)
+                w.hex_matrix_new[self.matrix_index][self.list_index].idents.append(to_become)
+
+        # else, we are dealing with multiple hexes, including a stationary hex
+        # TODO: stationary cases here!!!
         else:
             pass
-
-
-        
 
 
 ###############################################################################################################
