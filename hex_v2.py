@@ -69,6 +69,15 @@ class Hex:
 
     ##########################################################################################################
 
+    def make_wall(self):
+        # Wipe idents currently stored
+        self.idents.clear()
+        # Walls are black
+        # -2 state is a wall
+        self.idents.append(Ident((0, 0, 0), -2))
+
+    ##########################################################################################################
+
     # Checks if a hex contains an ident heading in the given directon
     # If it does, returns that ident
     # Else returns None
@@ -80,6 +89,14 @@ class Hex:
                 return ident
 
         return None
+
+    ##########################################################################################################
+
+    def is_occupied(self):
+        if len(self.idents) == 0:
+            return False
+        else:
+            return True
 
     ##########################################################################################################
 
@@ -125,10 +142,12 @@ class Ident:
 
     ##########################################################################################################
 
-    def __init__(self, matrix_index, list_index, color=(255, 255, 255), state = -1, serial_number = -1, hist = None):
+    def __init__(self, matrix_index, list_index, color=(255, 255, 255), state = -1, serial_number = -1, hist = None, myworld = None):
         if hist is None:
             hist = []
         self.color = color
+
+        self.myworld = myworld
 
         self.state = state
         self.hist = hist
@@ -151,6 +170,21 @@ class Ident:
 
         self.matrix_index = matrix_index
         self.list_index = list_index
+
+    def move_to(self, new_matrix_index, new_list_index):
+        # remove trace
+        self.myworld.hex_matrix[self.matrix_index][self.list_index].idents = []
+
+        # put into new spot
+        self.myworld.hex_matrix[new_matrix_index][new_list_index].idents.append(self)
+
+        # update index
+        self.matrix_index = new_matrix_index
+        self.list_index = new_list_index
+
+
+
+
     
     # TODO: Write this method
     # Writes to hex_matrix_new
@@ -159,9 +193,53 @@ class Ident:
 
         # Maintain walls and stationaries and return
 
+        if self.state >= 0: # if moving
+            # first, check the one in front of you
+
+            # this will depend on which direction you are moving in
+
+            # moving up
+            if self.state == 0: # moving up
+
+                # first see if you crash
+                if self.myworld.hex_matrix[self.matrix_index][self.list_index-1].contains_direction(-1) != None or self.myworld.hex_matrix[self.matrix_index][self.list_index-1].contains_direction(3) != None:
+                    print("might move, deal with later")
+
+                # else, you can move
+                else:
+                    self.move_to(self.matrix_index, self.list_index-1)
+                pass
+
+            elif self.state == 1:  # moving northeast
+                # first see if you can go
+                # else, you collide
+                pass
+
+            elif self.state == 2:  # moving southeast
+                # first see if you can go
+                # else, you collide
+                pass
+
+            elif self.state == 3:  # moving down
+                # first see if you can go
+                # else, you collide
+                pass
+
+            elif self.state == 4:  # moving southwest
+                # first see if you can go
+                # else, you collide
+                pass
+
+            elif self.state == 5:  # moving northwest
+                # first see if you can go
+                # else, you collide
+                pass
+
+
         # If need to bounce (wall or head-on), then bounce and return
 
         # Advance all others
+
 
         pass
 
@@ -283,7 +361,7 @@ class World:
             direction = int(line_parts[4])
             color_text = line_parts[3]
             color = World.__get_color(color_text)
-            new_ident = Ident(matrix_index, list_index, color = color, state = direction)
+            new_ident = Ident(matrix_index, list_index, color = color, state = direction, myworld = self)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_ident)
@@ -291,13 +369,13 @@ class World:
         elif command == "occupied":
             color_text = line_parts[3]
             color = World.__get_color(color_text)
-            new_ident = Ident(matrix_index, list_index, color = color)
+            new_ident = Ident(matrix_index, list_index, color = color, myworld = self)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_ident)
             # self.hex_matrix[matrix_index][list_index].make_occupied(color)
         elif command == "wall" or command == "wall\n":
-            new_ident = Ident(matrix_index, list_index, color = (0,0,0), state = -2)
+            new_ident = Ident(matrix_index, list_index, color = (0,0,0), state = -2, myworld = self)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_ident)
@@ -344,9 +422,29 @@ class World:
         # TODO: Have repair_collisions write from new to original
         # self.__swap_matrices_and_lists()
     
-    ##########################################################################################################
+    #########################################################################################################
+
 
     def run(self):
+        clock = pygame.time.Clock()
+        dt = 0
+
+        # Create walls around the edges
+        # Left edge
+        for hex in self.hex_matrix[0]:
+            hex.make_wall()
+        # Right edge
+        for hex in self.hex_matrix[13]:
+            hex.make_wall()
+        for i in range(6):
+            # Top edge
+            self.hex_matrix[1 + 2 * i][6 - i].make_wall()
+            self.hex_matrix[2 + 2 * i][6 - i].make_wall()
+
+            # Bottom edge
+            self.hex_matrix[1 + 2 * i][15 - i].make_wall()
+            self.hex_matrix[2 + 2 * i][14 - i].make_wall()
+
         run = True
         while run:
 
@@ -356,6 +454,8 @@ class World:
                     run = False
             
             self.__draw()
+
+            dt = clock.tick(5) / 1000
 
             # flips to the next frame
             pygame.display.flip()

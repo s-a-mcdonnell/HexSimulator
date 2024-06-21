@@ -1,8 +1,6 @@
-5 7 move GREEN 3
+5 7 move GREEN 0
 6 7 move BLUE 4
 6 8 move PURPLE 5
-5 9 move RED 0
+5 9 move RED 3
 4 9 move PINK 1
 4 8 move CYAN 2
-4 8 move ORANGE 3
-5 8 occupied MAROON
