@@ -265,6 +265,7 @@ class World:
 
         # Set up hex matrix
         self.hex_matrix = []
+        self.hex_matrix_new = []
 
         for x in range(15):
             hex_list = []
@@ -276,6 +277,7 @@ class World:
 
         # Set up ident list
         self.ident_list = []
+        self.ident_list_new = []
 
 
         # reading the intiial state of the hex board from a file
@@ -323,7 +325,7 @@ class World:
             direction = int(line_parts[4])
             color_text = line_parts[3]
             color = World.get_color(color_text)
-            new_ident = Ident(matrix_index, list_index, color = color, state = direction)
+            new_ident = Ident(matrix_index, list_index, self, color = color, state = direction)
             self.ident_list.append(new_ident)
             # TODO: Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_ident)
@@ -369,9 +371,8 @@ class World:
             ident.advance_or_flip()
                 
         # Fix collisions
-        for hex_list in self.hex_matrix:
-            for hex in hex_list:
-                hex.repair_collisions()
+        for ident in self.ident_list:
+            ident.repair_collisions()
 
         # TODO: Write this method, iterating through idents
     
