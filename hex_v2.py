@@ -209,12 +209,25 @@ class Ident:
 
         # Else become stationary
         else:
-            print("ident with serial number " + str(self.serial_number) + " becoming stationary")
 
             # Remove alt version of self from the to remove list
             self.remove_from_list(w.alt_idents_to_remove)
 
+            # Get neighbors pointing at self
+            neighbors_pointing_at_me = [None]*6
+            for i in range(6):
+                # NOTE: This method automatically uses hex_matrix, which I'm not sure is helpful here
+                neighbors_pointing_at_me[i] = self.__neighbor_contains_direction((i+3)%6, i)
+
+            # Add said neighbors to a list in world of moving hexes to double check
+           #  w.idents_to___.append(neighbor)
+            
+
+            # 
+
             # TODO: What about the moving ident we want to hit this and turn stationary? (triangle collision)
+            # Does our newly stationary hex have any identities running into it?
+
             '''
             example case:
             5 7 occupied CYAN
