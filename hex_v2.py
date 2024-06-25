@@ -206,6 +206,105 @@ class Ident:
 
     ##########################################################################################################
 
+    # Handle collisions between self (stationary) and moving idents within the same hex
+    def __stationary_collide_moving(self, directions, hex, write_to_hex):
+        dir = self.state
+        w = self.world
+
+        # if we contain opposite pairs, remove them from the directions list
+        directions = self.__remove_pairs(hex, dir, directions)
+
+        # If there are no idents left in directions, remain stationary
+        if len(directions) == 0:
+            # TODO: Is copying necessary?
+            my_copy = self.__copy()
+            write_to_hex.idents.append(my_copy)
+            w.ident_list.append(my_copy)
+
+            if self in w.agents:
+                w.swap_agents(self, my_copy)
+
+        # If there is only one ident left in directions, take its state
+        elif len(directions) == 1:
+            self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[0].state)
+    
+        elif len(directions) == 2:
+            # TODO: Note that this is copied directly from above --> how can we restructure?
+                # if the other two are at 120 degrees to each other, take the value in between
+            if (directions[0].state + 2)%6 == directions[1].state:
+                print("rotate call a")
+                self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = (directions[0].state + 1)%6)
+            elif (directions[0].state - 2)%6 == directions[1].state:
+                print("rotate call b")
+                self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = (directions[0].state - 1)%6)
+            
+            # if the other two cohabitants are adjacent to one another (60 degrees), take one of the states (arbitrary formula)
+            # TODO: ^^ Note that this is an arbitrary decision ^^
+            else:
+                # TODO: Note that this runs into issues when there is superimposition of multiple stationary idents
+                assert(directions[0].state != -1 and directions[1].state != -1)
+
+                assert(((directions[0].state + 1)%6 == directions[1].state) or ((directions[0].state - 1)%6 == directions[1].state))
+                
+                # TODO: Change decision-making for which state to take?
+                state_to_take = directions[0].state
+                if (directions[0].state - directions[1].state)%6 > 2:
+                    state_to_take = directions[1].state
+                
+                self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = state_to_take)
+                
+                
+        elif len(directions) == 3:
+            # If there are three moving idents which have not been removed from directions,
+            # they are either all adjacent to one another
+            # or they are symmetrical (all at 120 degrees from one another)
+            
+            # Symmetrical case --> stationary hex does not move
+            if (directions[0].find_offset(directions[1]) == 2 and directions[1].find_offset(directions[2]) == 2):
+                # TODO: Is copying necessary?
+                my_copy = self.__copy()
+                write_to_hex.idents.append(my_copy)
+                w.ident_list.append(my_copy)
+
+                if self in w.agents:
+                    w.swap_agents(self, my_copy)
+            
+            # Adjacent case (the three moving idents are clumped together) --> stationary hex is bumped in the direction of the middle ident
+            else:
+
+                # TODO: Add assertion here?
+
+                
+                direc_0_1_offset = directions[0].find_offset(directions[1])
+                direc_1_2_offset = directions[1].find_offset(directions[2])
+                direc_0_2_offset = directions[0].find_offset(directions[2])
+                
+                # If directions[0] has the middle state, take that state
+                if direc_0_1_offset == 1 and direc_0_2_offset == 1:
+                    # TODO: Is copying necessary?
+                    self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[0].state)
+                
+                # If directions[1] has the middle state, take that state
+                elif direc_1_2_offset == 1 and direc_0_1_offset == 1:
+                    # TODO: Is copying necessary?
+                    self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[1].state)
+
+                # If directions[2] has the middle state, take that state
+                elif direc_0_2_offset == 1 and direc_1_2_offset == 1:
+                    # TODO: Is copying necessary?
+                    self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[2].state)
+
+                else:
+                    # None of the three idents have been calcualted to be in the middle
+                    print("Error: No middle direction found")
+                    pass
+
+        else:
+            print("Error: Unexpected length of directions")
+            pass
+
+    ##########################################################################################################
+
      # TODO: Write this method
     # note that I should never have to deal with walls in this method
     # note that this reads from hex_matrix_new and ident_list_new and writes to hex_matrix and ident_list
@@ -234,8 +333,7 @@ class Ident:
             write_to_hex.idents.append(my_copy)
 
             if self in w.agents:
-                w.agents.remove(self)
-                w.agents.append(my_copy)
+                w.swap_agents(self, my_copy)
 
             return
         
@@ -319,7 +417,9 @@ class Ident:
             
             # A stationary ident colliding with a moving ident
             if self.state == -1:
+                self.__stationary_collide_moving(directions, hex, write_to_hex)
 
+                '''
                 # if we contain opposite pairs, remove them from the directions list
                 directions = self.__remove_pairs(hex, dir, directions)
 
@@ -412,7 +512,7 @@ class Ident:
 
                 else:
                     print("Error: Unexpected length of directions")
-                    pass
+                    pass'''
 
             # A moving ident (self) colliding with a stationary ident (another ident in the hex)
             else:
@@ -422,7 +522,7 @@ class Ident:
 
     ##########################################################################################################
 
-    # _____
+    # TODO: To be used to fix corner collision superimposition problem
     def fix_newly_stationary(self):
         # NOTE: We are reading from hex_matrix because that is what resolve_collisions() writes to
         my_hex = self.world.hex_matrix[self.matrix_index][self.list_index]
@@ -497,8 +597,7 @@ class Ident:
         future_hex.idents.append(ident)
 
         if self in self.world.agents:
-            self.world.agents.remove(self)
-            self.world.agents.append(ident)
+            self.world.swap_agents(self, ident)
 
     ##########################################################################################################
     
@@ -519,9 +618,7 @@ class Ident:
             future_hex.idents.append(my_copy)
 
             if self in self.world.agents:
-                self.world.agents.remove(self)
-                self.world.agents.append(my_copy)
-
+                self.world.swap_agents(self, my_copy)
             return
 
         # If need to bounce head-on off of a wall, then bounce and return
@@ -564,8 +661,7 @@ class Ident:
             future_neighbor.idents.append(copy_to_move)
 
             if self in self.world.agents:
-                self.world.agents.remove(self)
-                self.world.agents.append(copy_to_move)
+                self.world.swap_agents(self, copy_to_move)
 
     ##########################################################################################################
 
@@ -835,7 +931,7 @@ class World:
         # Set up list of newly stationary hexes to be used to repair damage
         self.newly_stationary = [] 
 
-        # Default agent to None (will be assigned a value in __read_line if one exists)
+        # Set up agents list (will be filled in __read_line if agents exist)
         self.agents = []
 
 
@@ -891,9 +987,10 @@ class World:
 
     ##########################################################################################################
     
-    # ___
+    # Swaps one agent in for another in the agents list
     def swap_agents(self, agent_to_remove, agent_to_append):
-        pass
+        self.agents.remove(agent_to_remove)
+        self.agents.append(agent_to_append)
     
     ##########################################################################################################
     @classmethod
@@ -978,13 +1075,17 @@ class World:
             self.ident_list.append(new_ident_2)
 
         elif command == "agent" or command == "agent\n":
-            # NOTE: This is currently only equipped to create one agent
             
-            direction = int(line_parts[4])
             color_text = line_parts[3]
             color = World.__get_color(color_text)
 
-            new_agent = Ident(matrix_index, list_index, self, color = color, state = direction)
+            new_agent = Ident(matrix_index, list_index, self, color = color)
+
+            # The defauly agent initializes to stationary, but it can initialize with a direction
+            # NOTE: A stationary agent will not begin to move unitl hit
+            if len(line_parts) > 4:
+                new_agent.state =  int(line_parts[4])
+
 
             # Add ident to ident list
             self.ident_list.append(new_agent)
