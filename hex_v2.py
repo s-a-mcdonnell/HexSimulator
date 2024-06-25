@@ -230,13 +230,17 @@ class Ident:
 
         # If there are no idents left in directions, remain stationary
         if len(directions) == 0:
-            # TODO: Is copying necessary?
+            '''# TODO: Is copying necessary?
             my_copy = self.__copy()
             write_to_hex.idents.append(my_copy)
             write_to_list.append(my_copy)
 
             if self in w.agents:
-                w.swap_agents(self, my_copy)
+                w.swap_agents(self, my_copy)'''
+
+            # NOTE: ^^ I'm hoping the above lack of copying will fix the error with alt_idents_to_remove -- Skyler
+            w.ident_list.append(self)
+            write_to_hex.idents.append(self)
 
         # If there is only one ident left in directions, take its state
         elif len(directions) == 1:
@@ -339,14 +343,18 @@ class Ident:
         if len(hex.idents) <= 1:
             print("No collision to resolve")
 
-            # TODO: Is copying necessary here?
+            '''# TODO: Is copying necessary here?
             my_copy = self.__copy()
 
             w.ident_list.append(my_copy)
             write_to_hex.idents.append(my_copy)
 
             if self in w.agents:
-                w.swap_agents(self, my_copy)
+                w.swap_agents(self, my_copy)'''
+            w.ident_list.append(self)
+            write_to_hex.idents.append(self)
+
+            # NOTE: ^^ I'm hoping the above lack of copying will fix the error with alt_idents_to_remove -- Skyler
 
             return
         
@@ -361,18 +369,13 @@ class Ident:
         '''my_index = hex.get_ident_index(self)'''
         dir = self.state
 
+        # Store the other idents in the same hex
         directions = []
 
-        # TODO: consider appending just the directions/states of the idents instead of appending the idents themselves
         for ident in hex.idents:
-            '''if i != my_index:
-                directions.append(hex.idents[i])'''
-            # TODO: This is the only way I've found to not accidentally append self when examining a stationary hex. Why is that?
             # Do not add portal idents to list
             if (ident.serial_number != self.serial_number) and (not ident.is_portal()):
                 directions.append(ident)
-            '''if ident is not self:
-                directions.append(ident)'''
 
         # if there was only one other ident in the collision, take its attributes
         # Note that this also deals with the most simple collision betwen a moving ident and a stationary one
@@ -392,6 +395,8 @@ class Ident:
             elif len(directions) == 1:
                 print("rotate call e")
                 self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[0].state)
+
+                # TODO: Do something with self.world.alt_idents_to_remove
 
             # otherwise, there are exactly two other directions stored in this hex
             else:
@@ -553,6 +558,7 @@ class Ident:
         # TODO: Check how head_on_stationary is calcuated
         head_on_stationary = self.__neighbor_contains_direction(-1, self.state)
         if head_on_stationary:
+            print("Becoming stationary in advance_or_flip()")
             self.world.alt_idents_to_remove.append(self)
             self.__rotate_adopt(future_hex, future_list, dir_final = -1)
 
