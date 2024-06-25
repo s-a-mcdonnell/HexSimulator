@@ -414,31 +414,10 @@ class Ident:
                     print("Error: Unexpected length of directions")
                     pass
 
-            # A moving ident colliding with a stationary ident
+            # A moving ident (self) colliding with a stationary ident (another ident in the hex)
             else:
 
                 self.__moving_collide_stationary(hex)
-
-                '''assert self.state >= 0
-
-                hex_of_origin = self.__get_neighbor(w.hex_matrix, (self.state + 3)%6)
-                assert hex_of_origin
-
-                # If an ident with the opposite state is present, bounce off
-                if hex.contains_direction((dir + 3) % 6):
-                    self.__rotate_adopt(hex_of_origin, w.ident_list)
-                
-                # If two idents that sum to the opposite state are present, bounce off
-                elif hex.contains_direction((dir + 2) % 6) and hex.contains_direction((dir + 4) % 6):
-                    self.__rotate_adopt(hex_of_origin, w.ident_list)
-
-                # Else become stationary
-                else:
-                    print("ident with serial number " + str(self.serial_number) + " becoming stationary")
-                    self.__rotate_adopt(hex_of_origin, w.ident_list, dir_final = - 1)
-                    
-                    # Save self to the newly stationary list for potential repairs
-                    w.newly_stationary.append(self)'''
                 
 
     ##########################################################################################################
