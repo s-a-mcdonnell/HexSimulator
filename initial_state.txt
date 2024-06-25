@@ -1,4 +1,3 @@
 5 7 occupied CYAN
-6 7 occupied MAROON
-4 8 occupied PURPLE
-5 10 move RED 0
+3 7 move MAROON 2
+7 7 move PURPLE 5
