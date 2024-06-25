@@ -265,7 +265,7 @@ class Ident:
                 # TODO: Is copying necessary?
                 my_copy = self.__copy()
                 write_to_hex.idents.append(my_copy)
-               write_to_list.append(my_copy)
+                write_to_list.append(my_copy)
 
                 if self in w.agents:
                     w.swap_agents(self, my_copy)
@@ -517,11 +517,11 @@ class Ident:
             # A moving ident (self) colliding with a stationary ident (another ident in the hex)
             else:
 
-                self.__moving_collide_stationary(hex, self.hex_matrix, self.ident_list)
+                self.__moving_collide_stationary(hex, w.hex_matrix, w.ident_list)
                 
 
     ##########################################################################################################
-
+    '''
     # TODO: To be used to fix corner collision superimposition problem
     def fix_newly_stationary(self):
         # NOTE: We are reading from hex_matrix because that is what resolve_collisions() writes to
@@ -543,8 +543,12 @@ class Ident:
 
         self.__stationary_collide_moving(other_idents_in_hex, read_from_hex, write_to_hex, self.world.stationary_temp_list)
 
-        # TODO: Write from stationary temp storage/list to hex matrix/ident list
-
+        for hex_list in self.world.stationary_temp_storage:
+            for hex in hex_list:
+                pass
+                # TODO: Write from stationary temp storage/list to hex matrix/ident list
+    
+    '''
 
 
     ##########################################################################################################
@@ -1280,7 +1284,7 @@ class World:
         for ident in self.ident_list_new:
             ident.resolve_collisions()
         
-        # Re-fix collisions for any newly stationary idents that are in a state of superimposition
+        '''# Re-fix collisions for any newly stationary idents that are in a state of superimposition
         # TODO: Fix this method (esp. where it reads from/writes to)
         while len(self.newly_stationary):
             print("Resolving stationary superimpositions")
@@ -1290,14 +1294,11 @@ class World:
             self.newly_stationary.clear()
             for row in self.stationary_temp_storage:
                 row.clear()
-            self.stationary_temp_list.clear()
+            self.stationary_temp_list.clear()''' 
 
         # Move idents between portals
         # TODO: Maintain separate portal list?
         self.__handle_portals()
-
-        '''if self.agent:
-            self.agent.get_next_move()'''
 
     ##########################################################################################################
 
