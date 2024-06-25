@@ -179,7 +179,7 @@ class Ident:
     ##########################################################################################################
 
     # Removes the ident(s) with self's serial number from the passed list
-    def __remove_from_list(self, my_list):
+    def remove_from_list(self, my_list):
         for ident in my_list:
             if ident.serial_number == self.serial_number:
                 my_list.remove(ident)
@@ -212,7 +212,7 @@ class Ident:
             print("ident with serial number " + str(self.serial_number) + " becoming stationary")
 
             # Remove alt version of self from the to remove list
-            self.__remove_from_list(w.alt_idents_to_remove)
+            self.remove_from_list(w.alt_idents_to_remove)
 
             pass
             # NOTE: the folowing commented-out code should be taken care of by the adjustment to advance_or_flip
@@ -230,17 +230,13 @@ class Ident:
 
         # If there are no idents left in directions, remain stationary
         if len(directions) == 0:
-            '''# TODO: Is copying necessary?
+            # TODO: Is copying necessary?
             my_copy = self.__copy()
             write_to_hex.idents.append(my_copy)
             write_to_list.append(my_copy)
 
             if self in w.agents:
-                w.swap_agents(self, my_copy)'''
-
-            # NOTE: ^^ I'm hoping the above lack of copying will fix the error with alt_idents_to_remove -- Skyler
-            w.ident_list.append(self)
-            write_to_hex.idents.append(self)
+                w.swap_agents(self, my_copy)
 
         # If there is only one ident left in directions, take its state
         elif len(directions) == 1:
@@ -343,18 +339,14 @@ class Ident:
         if len(hex.idents) <= 1:
             print("No collision to resolve")
 
-            '''# TODO: Is copying necessary here?
+            # TODO: Is copying necessary here?
             my_copy = self.__copy()
 
             w.ident_list.append(my_copy)
             write_to_hex.idents.append(my_copy)
 
             if self in w.agents:
-                w.swap_agents(self, my_copy)'''
-            w.ident_list.append(self)
-            write_to_hex.idents.append(self)
-
-            # NOTE: ^^ I'm hoping the above lack of copying will fix the error with alt_idents_to_remove -- Skyler
+                w.swap_agents(self, my_copy)
 
             return
         
@@ -1185,8 +1177,8 @@ class World:
         # TODO: Fix something with self.alt_idents_to_remove
         # Remove redunant stationary idents (stored in alt_idents_to_remove)\
         for ident in self.alt_idents_to_remove:
-            self.ident_list.remove(ident)
-            self.hex_matrix[ident.matrix_index][ident.list_index].idents.remove(ident)
+            ident.remove_from_list(self.ident_list)
+            ident.remove_from_list(self.hex_matrix[ident.matrix_index][ident.list_index].idents)
 
         # TODO: Could move the clearing of self.alt_idents_to_remove to here
 
