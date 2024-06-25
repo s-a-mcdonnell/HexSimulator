@@ -1,3 +1,3 @@
-5 6 move YELLOW 2
-5 11 move PURPLE 1
-10 6 occupied ORANGE
+6 9 occupied RED
+8 9 move BLUE 5
+4 11 move ORANGE 1

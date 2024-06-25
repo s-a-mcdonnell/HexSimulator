@@ -175,6 +175,34 @@ class Ident:
     # Returns a boolean indicating whether or not the given ident is a portal
     def is_portal(self):
         return self.property == "portal"
+    
+    ##########################################################################################################
+    
+    # Handles cases where self (a moving hex) collides with a stationary hex
+    # TODO: How to handle the rounds of writing happening due to the newly stationary hexes?
+    def __moving_collide_stationary(self, hex):
+                w = self.world
+
+                assert self.state >= 0
+
+                hex_of_origin = self.__get_neighbor(w.hex_matrix, (self.state + 3)%6)
+                assert hex_of_origin
+
+                # If an ident with the opposite state is present, bounce off
+                if hex.contains_direction((self.state + 3) % 6):
+                    self.__rotate_adopt(hex_of_origin, w.ident_list)
+                
+                # If two idents that sum to the opposite state are present, bounce off
+                elif hex.contains_direction((self.state + 2) % 6) and hex.contains_direction((self.state + 4) % 6):
+                    self.__rotate_adopt(hex_of_origin, w.ident_list)
+
+                # Else become stationary
+                else:
+                    print("ident with serial number " + str(self.serial_number) + " becoming stationary")
+                    self.__rotate_adopt(hex_of_origin, w.ident_list, dir_final = - 1)
+                    
+                    # Save self to the newly stationary list for potential repairs
+                    w.newly_stationary.append(self)
 
     ##########################################################################################################
 
@@ -285,9 +313,7 @@ class Ident:
                         print("rotate call d")
                         self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[0].state)
 
-        # else, we are dealing with multiple hexes, including a stationary hex
-        # TODO: Did you mean idents in the above comment? - Skyler
-        # TODO: stationary cases here!!!
+        # else, we are dealing with multiple idents, including a stationary ident
         else:
             assert(hex.contains_direction(-1))
             
@@ -391,7 +417,9 @@ class Ident:
             # A moving ident colliding with a stationary ident
             else:
 
-                assert self.state >= 0
+                self.__moving_collide_stationary(hex)
+
+                '''assert self.state >= 0
 
                 hex_of_origin = self.__get_neighbor(w.hex_matrix, (self.state + 3)%6)
                 assert hex_of_origin
@@ -408,7 +436,29 @@ class Ident:
                 else:
                     print("ident with serial number " + str(self.serial_number) + " becoming stationary")
                     self.__rotate_adopt(hex_of_origin, w.ident_list, dir_final = - 1)
+                    
+                    # Save self to the newly stationary list for potential repairs
+                    w.newly_stationary.append(self)'''
                 
+
+    ##########################################################################################################
+
+    # _____
+    def fix_newly_stationary(self):
+        # NOTE: We are reading from hex_matrix because that is what resolve_collisions() writes to
+        my_hex = self.world.hex_matrix[self.matrix_index][self.list_index]
+        
+        # Get other idents in the hex
+        other_idents_in_hex = []
+        for ident in my_hex.idents:
+            if ident.serial_number != self.serial_number:
+                other_idents_in_hex.append(ident)
+        
+        # TODO: Is this the write method to call?
+        for ident in other_idents_in_hex:
+            if ident.state >= 0:
+                ident.__moving_collide_stationary(my_hex)
+
 
     ##########################################################################################################
 
@@ -803,6 +853,9 @@ class World:
         # Set up wall list
         self.wall_list = []
 
+        # Set up list of newly stationary hexes to be used to repair damage
+        self.newly_stationary = [] 
+
         # Default agent to None (will be assigned a value in __read_line if one exists)
         self.agents = []
 
@@ -1114,7 +1167,7 @@ class World:
         for ident in self.ident_list:
             ident.advance_or_flip()
 
-        # Clear the current matrix and list so that resolve_collisions can write to it
+        # Clear the current hex matrix, ident list, and newly stationary list so that resolve_collisions can write to it
         for hex_list in self.hex_matrix:
             for hex in hex_list:
                 # Save wall_ident to add back in, if applicable
@@ -1126,10 +1179,21 @@ class World:
                     self.hex_matrix[wall_ident.matrix_index][wall_ident.list_index].idents.append(wall_ident)
         
         self.ident_list.clear()
+
+        self.newly_stationary.clear()
                 
         # Fix collisions in all idents (except for walls)
         for ident in self.ident_list_new:
             ident.resolve_collisions()
+        
+        '''# Re-fix collisions for any newly stationary idents that are in a state of superimposition
+        # TODO: Fix this method (esp. where it reads from/writes to)
+        while len(self.newly_stationary):
+            print("Resolving stationary superimpositions")
+
+            for ident in self.newly_stationary:
+                ident.fix_newly_stationary()
+            self.newly_stationary.clear()'''
 
         # Move idents between portals
         # TODO: Maintain separate portal list?
