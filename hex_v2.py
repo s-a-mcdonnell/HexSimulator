@@ -214,7 +214,16 @@ class Ident:
             # Remove alt version of self from the to remove list
             self.remove_from_list(w.alt_idents_to_remove)
 
-            pass
+            # TODO: What about the moving ident we want to hit this and turn stationary? (triangle collision)
+            '''
+            example case:
+            5 7 occupied CYAN
+            5 8 move PURPLE 0
+            4 8 move GREEN 2
+
+            What to do about green?
+            '''
+
             # NOTE: the folowing commented-out code should be taken care of by the adjustment to advance_or_flip
             #self.__rotate_adopt(hex_of_origin, write_to_ident_list, dir_final = - 1)
 
@@ -324,7 +333,6 @@ class Ident:
     def resolve_collisions(self):
         w = self.world
 
-        
         # If self is a portal, do nothing
         if self.is_portal():
             w.hex_matrix[self.matrix_index][self.list_index].idents.append(self)
@@ -1124,7 +1132,7 @@ class World:
 
     def __update(self):
         
-        # Clear out list that helps remove redundant identities
+        # Clear out list that helps remove redundant stationary identities
         self.alt_idents_to_remove.clear()
 
         # Agents act
@@ -1132,7 +1140,6 @@ class World:
             agent.get_next_move()
 
         # Push history of idents and walls
-        # TODO: Should this go before or after the rotation of the agents?
         for ident in self.ident_list:
             ident.visited(ident.matrix_index, ident.list_index)
         
@@ -1157,7 +1164,7 @@ class World:
         for ident in self.ident_list:
             ident.advance_or_flip()
 
-        # Clear the current hex matrix, ident list, and newly stationary list so that resolve_collisions can write to it
+        # Clear the current hex matrix and ident list list so that resolve_collisions can write to it
         for hex_list in self.hex_matrix:
             for hex in hex_list:
                 # Save wall_ident to add back in, if applicable
