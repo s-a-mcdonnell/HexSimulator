@@ -180,34 +180,34 @@ class Ident:
     
     # Handles cases where self (a moving hex) collides with a stationary hex
     # TODO: How to handle the rounds of writing happening due to the newly stationary hexes?
-    def __moving_collide_stationary(self, hex):
-                w = self.world
+    def __moving_collide_stationary(self, read_from_hex, write_to_matrix, write_to_ident_list):
+        w = self.world
 
-                assert self.state >= 0
+        assert self.state >= 0
 
-                hex_of_origin = self.__get_neighbor(w.hex_matrix, (self.state + 3)%6)
-                assert hex_of_origin
+        hex_of_origin = self.__get_neighbor(write_to_matrix, (self.state + 3)%6)
+        assert hex_of_origin
 
-                # If an ident with the opposite state is present, bounce off
-                if hex.contains_direction((self.state + 3) % 6):
-                    self.__rotate_adopt(hex_of_origin, w.ident_list)
-                
-                # If two idents that sum to the opposite state are present, bounce off
-                elif hex.contains_direction((self.state + 2) % 6) and hex.contains_direction((self.state + 4) % 6):
-                    self.__rotate_adopt(hex_of_origin, w.ident_list)
+        # If an ident with the opposite state is present, bounce off
+        if read_from_hex.contains_direction((self.state + 3) % 6):
+            self.__rotate_adopt(hex_of_origin, write_to_ident_list)
+        
+        # If two idents that sum to the opposite state are present, bounce off
+        elif read_from_hex.contains_direction((self.state + 2) % 6) and read_from_hex.contains_direction((self.state + 4) % 6):
+            self.__rotate_adopt(hex_of_origin, write_to_ident_list)
 
-                # Else become stationary
-                else:
-                    print("ident with serial number " + str(self.serial_number) + " becoming stationary")
-                    self.__rotate_adopt(hex_of_origin, w.ident_list, dir_final = - 1)
-                    
-                    # Save self to the newly stationary list for potential repairs
-                    w.newly_stationary.append(self)
+        # Else become stationary
+        else:
+            print("ident with serial number " + str(self.serial_number) + " becoming stationary")
+            self.__rotate_adopt(hex_of_origin, write_to_ident_list, dir_final = - 1)
+            
+            # Save self to the newly stationary list for potential repairs
+            w.newly_stationary.append(self)
 
     ##########################################################################################################
 
     # Handle collisions between self (stationary) and moving idents within the same hex
-    def __stationary_collide_moving(self, directions, hex, write_to_hex):
+    def __stationary_collide_moving(self, directions, hex, write_to_hex, write_to_list):
         dir = self.state
         w = self.world
 
@@ -219,24 +219,25 @@ class Ident:
             # TODO: Is copying necessary?
             my_copy = self.__copy()
             write_to_hex.idents.append(my_copy)
-            w.ident_list.append(my_copy)
+            write_to_list.append(my_copy)
 
+            #TODO: Will this cause problems when called from fix_newly_stationary?
             if self in w.agents:
                 w.swap_agents(self, my_copy)
 
         # If there is only one ident left in directions, take its state
         elif len(directions) == 1:
-            self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[0].state)
+            self.__rotate_adopt(write_to_hex, write_to_list, dir_final = directions[0].state)
     
         elif len(directions) == 2:
             # TODO: Note that this is copied directly from above --> how can we restructure?
                 # if the other two are at 120 degrees to each other, take the value in between
             if (directions[0].state + 2)%6 == directions[1].state:
                 print("rotate call a")
-                self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = (directions[0].state + 1)%6)
+                self.__rotate_adopt(write_to_hex, write_to_list, dir_final = (directions[0].state + 1)%6)
             elif (directions[0].state - 2)%6 == directions[1].state:
                 print("rotate call b")
-                self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = (directions[0].state - 1)%6)
+                self.__rotate_adopt(write_to_hex, write_to_list, dir_final = (directions[0].state - 1)%6)
             
             # if the other two cohabitants are adjacent to one another (60 degrees), take one of the states (arbitrary formula)
             # TODO: ^^ Note that this is an arbitrary decision ^^
@@ -251,7 +252,7 @@ class Ident:
                 if (directions[0].state - directions[1].state)%6 > 2:
                     state_to_take = directions[1].state
                 
-                self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = state_to_take)
+                self.__rotate_adopt(write_to_hex, write_to_list, dir_final = state_to_take)
                 
                 
         elif len(directions) == 3:
@@ -264,7 +265,7 @@ class Ident:
                 # TODO: Is copying necessary?
                 my_copy = self.__copy()
                 write_to_hex.idents.append(my_copy)
-                w.ident_list.append(my_copy)
+               write_to_list.append(my_copy)
 
                 if self in w.agents:
                     w.swap_agents(self, my_copy)
@@ -273,7 +274,6 @@ class Ident:
             else:
 
                 # TODO: Add assertion here?
-
                 
                 direc_0_1_offset = directions[0].find_offset(directions[1])
                 direc_1_2_offset = directions[1].find_offset(directions[2])
@@ -282,17 +282,17 @@ class Ident:
                 # If directions[0] has the middle state, take that state
                 if direc_0_1_offset == 1 and direc_0_2_offset == 1:
                     # TODO: Is copying necessary?
-                    self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[0].state)
+                    self.__rotate_adopt(write_to_hex, write_to_list, dir_final = directions[0].state)
                 
                 # If directions[1] has the middle state, take that state
                 elif direc_1_2_offset == 1 and direc_0_1_offset == 1:
                     # TODO: Is copying necessary?
-                    self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[1].state)
+                    self.__rotate_adopt(write_to_hex, write_to_list, dir_final = directions[1].state)
 
                 # If directions[2] has the middle state, take that state
                 elif direc_0_2_offset == 1 and direc_1_2_offset == 1:
                     # TODO: Is copying necessary?
-                    self.__rotate_adopt(write_to_hex, w.ident_list, dir_final = directions[2].state)
+                    self.__rotate_adopt(write_to_hex, write_to_list, dir_final = directions[2].state)
 
                 else:
                     # None of the three idents have been calcualted to be in the middle
@@ -417,7 +417,7 @@ class Ident:
             
             # A stationary ident colliding with a moving ident
             if self.state == -1:
-                self.__stationary_collide_moving(directions, hex, write_to_hex)
+                self.__stationary_collide_moving(directions, hex, write_to_hex, w.ident_list)
 
                 '''
                 # if we contain opposite pairs, remove them from the directions list
@@ -517,7 +517,7 @@ class Ident:
             # A moving ident (self) colliding with a stationary ident (another ident in the hex)
             else:
 
-                self.__moving_collide_stationary(hex)
+                self.__moving_collide_stationary(hex, self.hex_matrix, self.ident_list)
                 
 
     ##########################################################################################################
@@ -525,18 +525,26 @@ class Ident:
     # TODO: To be used to fix corner collision superimposition problem
     def fix_newly_stationary(self):
         # NOTE: We are reading from hex_matrix because that is what resolve_collisions() writes to
-        my_hex = self.world.hex_matrix[self.matrix_index][self.list_index]
+        read_from_hex = self.world.hex_matrix[self.matrix_index][self.list_index]
+        write_to_hex = self.world.stationary_temp_storage[self.matrix_index][self.list_index]
         
         # Get other idents in the hex
         other_idents_in_hex = []
-        for ident in my_hex.idents:
+        for ident in read_from_hex.idents:
             if ident.serial_number != self.serial_number:
                 other_idents_in_hex.append(ident)
         
         # TODO: Is this the write method to call?
         for ident in other_idents_in_hex:
             if ident.state >= 0:
-                ident.__moving_collide_stationary(my_hex)
+                ident.__moving_collide_stationary(read_from_hex, self.world.stationary_temp_storage, self.world.stationary_temp_list)
+
+        other_idents_in_hex = self.__remove_pairs(read_from_hex, self.state, other_idents_in_hex)
+
+        self.__stationary_collide_moving(other_idents_in_hex, read_from_hex, write_to_hex, self.world.stationary_temp_list)
+
+        # TODO: Write from stationary temp storage/list to hex matrix/ident list
+
 
 
     ##########################################################################################################
@@ -887,6 +895,22 @@ class Hex:
 # for setting initial state of the world / having a student interact
 # while loop for running game goes in World
 class World:
+
+    @staticmethod
+    # Initializes a matrix of hexes of the given dimensions
+    def __init_matrix(dimension_1, dimension_2):
+        matrix = []
+
+        for x in range(dimension_1):
+            hex_list = []
+            matrix.append(hex_list)
+
+            for y in range(dimension_2):
+                myHex = Hex(x, y)
+                hex_list.append(myHex)
+        
+        return matrix
+
     def __init__(self, automatic_walls=True):
         pygame.init()
 
@@ -898,26 +922,12 @@ class World:
         pygame.display.set_caption("Hex Simulator")
 
         # Set up hex matrix
-        self.hex_matrix = []
+        self.hex_matrix = World.__init_matrix(15, 16)
 
-        for x in range(15):
-            hex_list = []
-            self.hex_matrix.append(hex_list)
-
-            for y in range(16):
-                myHex = Hex(x, y)
-                hex_list.append(myHex)
         
         # Set up new hex matrix
-        self.hex_matrix_new = []
+        self.hex_matrix_new = World.__init_matrix(len(self.hex_matrix), len(self.hex_matrix[0]))
 
-        for x in range(len(self.hex_matrix)):
-            hex_list_new = []
-            self.hex_matrix_new.append(hex_list_new)
-
-            for y in range(len(self.hex_matrix[x])):
-                myHex = Hex(x, y)
-                hex_list_new.append(myHex)
 
         # Set up ident list
         self.ident_list = []
@@ -930,6 +940,9 @@ class World:
 
         # Set up list of newly stationary hexes to be used to repair damage
         self.newly_stationary = [] 
+        # TODO: Do I actually use this?
+        self.stationary_temp_storage = World.__init_matrix(len(self.hex_matrix), len(self.hex_matrix[0]))
+        self.stationary_temp_list = []
 
         # Set up agents list (will be filled in __read_line if agents exist)
         self.agents = []
@@ -1260,20 +1273,24 @@ class World:
         
         self.ident_list.clear()
 
-        self.newly_stationary.clear()
+        # This is handled as part of the newly stationary while loop
+        # self.newly_stationary.clear()
                 
         # Fix collisions in all idents (except for walls)
         for ident in self.ident_list_new:
             ident.resolve_collisions()
         
-        '''# Re-fix collisions for any newly stationary idents that are in a state of superimposition
+        # Re-fix collisions for any newly stationary idents that are in a state of superimposition
         # TODO: Fix this method (esp. where it reads from/writes to)
         while len(self.newly_stationary):
             print("Resolving stationary superimpositions")
 
             for ident in self.newly_stationary:
                 ident.fix_newly_stationary()
-            self.newly_stationary.clear()'''
+            self.newly_stationary.clear()
+            for row in self.stationary_temp_storage:
+                row.clear()
+            self.stationary_temp_list.clear()
 
         # Move idents between portals
         # TODO: Maintain separate portal list?
