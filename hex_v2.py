@@ -27,6 +27,7 @@ class Ident:
     ##########################################################################################################
     
     def __init__(self, matrix_index, list_index, world, color=(255, 255, 255), state: int = -1, serial_number = -1, hist = None, property = None, partner_serial_number = -1, agent=None):
+
         if hist is None:
             hist = []
         self.color = color
@@ -62,12 +63,19 @@ class Ident:
 
         self.partner_serial_number = partner_serial_number
 
-        if agent == 'keyboard':
-            self.agent = KeyboardAgent()
-        else:
-            self.agent = AstarAgent(self)
+        self.agent = agent
 
-    ##########################################################################################################
+        #if agent == "keyboard":
+        #    self.agent = KeyboardAgent(self)
+        #    print("made key board agent yay")
+        #elif agent == "astar":
+        #    self.agent = AstarAgent(self)
+        #    print("made astar board agent try again")
+        #else:
+        #    self.agent =None
+
+
+            ##########################################################################################################
 
     # Public version of __get_neighbor
     # TODO: Check access control terminology for python
@@ -1320,16 +1328,26 @@ class World:
             direction = int(line_parts[4])
             color_text = line_parts[3]
             color = World.__get_color(color_text)
-            
-            if len(line_parts) == 6:
-                if line_parts[5] == 'astar':
-                    new_agent = Ident(matrix_index, list_index, self, color = color, state = direction, serial_number = -1, hist = None, property = "agent", agent="astar")
 
-            else:
-                new_agent = Ident(matrix_index, list_index, self, color = color, state = direction, serial_number = -1, hist = None, property = "agent", agent="keyboard")
+            new_agent = None
+
+            read = line_parts[5]
+            if read == "keyboard" or read == "keyboard\n":
+                new_agent = Ident(matrix_index, list_index, self, color = color, state = direction, serial_number = -1, hist = None, property = "agent", agent=KeyboardAgent())
+                new_agent.agent.set_ident(new_agent)
+                print("keyboard!!!!!!!!!!!!!!!!!!!!!!!!!!!:")
+
+            elif read == "astar" or read == "astar\n":
+                new_agent = Ident(matrix_index, list_index, self, color = color, state = direction, serial_number = -1, hist = None, property = "agent", agent=AstarAgent())
+                new_agent.agent.set_ident(new_agent)
+                print("ASTAR:")
+
 
             # Add ident to ident list
-            self.ident_list.append(new_agent)
+            if new_agent != None:
+                print("NOT NONE:")
+                print(new_agent)
+                self.ident_list.append(new_agent)
             
             # Add ident to hex
             self.hex_matrix[matrix_index][list_index].idents.append(new_agent)
