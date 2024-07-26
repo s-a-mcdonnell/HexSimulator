@@ -88,7 +88,7 @@ class Learner:
     
     ##########################################################################################################
 
-    def __init__(self, mem_per_eq, alphabet = ['0','1'], teacher_type=-1, num_states = -1, seed = -1, premade_dfa = None, display_graphs = False, accuracy_checks=False, wb=None, test_id=0):
+    def __init__(self, mem_per_eq, alphabet = ['0','1'], teacher_type=-1, num_states = -1, premade_dfa = None, display_graphs = False, accuracy_checks=False, wb=None, test_id=0):
         print(f"init called on Learner type {teacher_type}")
 
         self.solved = False
@@ -133,11 +133,11 @@ class Learner:
         # Else the DFA to be learned will be constructed by the teacher
         else:
             if teacher_type == -1:
-                self.my_teacher = Teacher(self.alphabet, mem_per_eq, num_states = num_states, seed = seed)
+                self.my_teacher = Teacher(self.alphabet, mem_per_eq, num_states = num_states)
             elif teacher_type == 0:
-                self.my_teacher = Movement_Teacher(self.alphabet, mem_per_eq, seed = seed)
+                self.my_teacher = Movement_Teacher(self.alphabet, mem_per_eq)
             elif teacher_type == 1:
-                self.my_teacher = Direction_Teacher(self.alphabet, mem_per_eq, seed = seed)
+                self.my_teacher = Direction_Teacher(self.alphabet, mem_per_eq)
             else:
                 exit("Error: Invalid teacher type")
 

@@ -23,7 +23,7 @@ class Teacher:
     ##########################################################################################################
 
     # Constructor
-    def __init__(self, alphabet, mem_per_eq:int, seed=-1, premade_dfa=None):
+    def __init__(self, alphabet, mem_per_eq:int, premade_dfa=None):
         self.alphabet = alphabet
 
         self.mem_per_eq = mem_per_eq
@@ -33,10 +33,6 @@ class Teacher:
             if len(symbol) != 3:
                 print("Error: Invalid alphabet. All symbols must be three hexadecimal characters.")
                 exit(1)
-
-        self.seed = seed
-        if seed == -1:
-            self.seed = 1821
 
         if premade_dfa:
             self.m = premade_dfa
