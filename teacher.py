@@ -60,25 +60,25 @@ class Teacher:
         # TODO: Manage walls? Differentiate between ring and freestanding walls?
         ''' walls just for the test case where things are a 3x3 square'''
         # TODO: Remove these walls
-        for i in range(5, 12):
-            new_ident = Ident(5, i, self.world)
+        for i in range(6, 11):
+            new_ident = Ident(6, i, self.world)
             new_ident.state = -2
-            self.world.hex_matrix[5][i].idents.append(new_ident)
+            self.world.hex_matrix[6][i].idents.append(new_ident)
             self.wall_list.append(new_ident)
 
-            new_ident2 = Ident(11, i, self.world)
+            new_ident2 = Ident(10, i, self.world)
             new_ident2.state = -2
-            self.world.hex_matrix[11][i].idents.append(new_ident2)
+            self.world.hex_matrix[10][i].idents.append(new_ident2)
             self.wall_list.append(new_ident2)
 
-            new_ident3 = Ident(i, 5, self.world)
+            new_ident3 = Ident(i, 6, self.world)
             new_ident.state3 = -2
-            self.world.hex_matrix[i][5].idents.append(new_ident3)
+            self.world.hex_matrix[i][6].idents.append(new_ident3)
             self.wall_list.append(new_ident3)
 
-            new_ident4 = Ident(i, 11, self.world)
+            new_ident4 = Ident(i, 10, self.world)
             new_ident4.state = -2
-            self.world.hex_matrix[i][11].idents.append(new_ident4)
+            self.world.hex_matrix[i][10].idents.append(new_ident4)
             self.wall_list.append(new_ident4)
         
         # TODO: Make sure that these are ints, not object references
