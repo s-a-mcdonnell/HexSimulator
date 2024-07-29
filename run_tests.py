@@ -18,8 +18,8 @@ else:
 # NOTE: You can set your own number of membership queries per equivalence query
 '''for mem_in_eq in [20, 50, 100, 150, 200]:'''
 test_num = 0
-for mem_in_eq in [100, 100]:
-    print(f"\nRunning test with {mem_in_eq} membershup queries per equivalence query\n")
+for mem_in_eq in [300, 300]:
+    print(f"\nRunning test with {mem_in_eq} membership queries per equivalence query\n")
     
     try:
         solver.run_solver(mem_in_eq, show_graphs=False, accuracy_checks=True, wb=wb, test_id=test_num)
