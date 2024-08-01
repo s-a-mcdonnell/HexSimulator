@@ -27,7 +27,7 @@ class Agent:
 #######################################################################################################################
 #                                              KEYBOARD AGENT CLASS                                                   #
 
-class KeyboardAgent(Agent):
+class Keyboard_Agent(Agent):
 
     ###################################################################################################################
 
@@ -60,7 +60,7 @@ class KeyboardAgent(Agent):
 
 
 
-class AstarAgent(Agent):
+class A_Star_Agent(Agent):
 
     # Constructor 
     def __init__(self, ident, index = 0):

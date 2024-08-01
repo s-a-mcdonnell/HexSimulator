@@ -3,7 +3,7 @@ import copy
 import os
 import pygame
 
-from Hex_Agents import *
+from hex_agents import *
 
 # Debugger
 import pdb
@@ -21,7 +21,7 @@ Process of the game:
 # for storing information about a particular moving hex
 class Ident:
 
-    # TODO: Do we still need this?
+    # Static variable to track number of Idents created
     idents_created = 0
 
     ##########################################################################################################
@@ -63,9 +63,9 @@ class Ident:
         self.partner_serial_number = partner_serial_number
 
         if agent == 'keyboard':
-            self.agent = KeyboardAgent(self)
+            self.agent = Keyboard_Agent(self)
         else:
-            self.agent = AstarAgent(self)
+            self.agent = A_Star_Agent(self)
 
     ##########################################################################################################
 

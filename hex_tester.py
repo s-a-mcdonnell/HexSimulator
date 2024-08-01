@@ -1,6 +1,5 @@
-from hex_v2 import World
+from hex_world import World
 
-# myWorld = World(automatic_walls=False)
 myWorld = World()
 
 myWorld.run()  
