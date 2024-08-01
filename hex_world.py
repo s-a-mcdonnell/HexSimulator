@@ -1126,6 +1126,10 @@ class Hex:
 class World:
 
     def __init__(self, automatic_walls=True):
+        '''
+        World constructor
+        :param automatic_walls=True: boolean, whether or not walls will be included around the displayed area
+        '''
 
         self.goalEnd = False
 
@@ -1235,8 +1239,13 @@ class World:
 
     ##########################################################################################################
     
-    # Swaps out one agent for another in the agent list
     def swap_agents(self, agent_to_remove, agent_to_append):
+        '''
+        Swaps out one agent for another in the agent list
+        :param agent_to_remove:
+        :param agent_to_append:
+        '''
+
         assert agent_to_remove.serial_number == agent_to_append.serial_number
         self.agents.remove(agent_to_remove)
         self.agents.append(agent_to_append)
@@ -1244,6 +1253,11 @@ class World:
     ##########################################################################################################
     @classmethod
     def __get_color(self, color_text):
+        '''
+        Returns color corresponding to passed string
+        :param color_text: string color name
+        '''
+
         if color_text == "YELLOW" or color_text == "YELLOW\n":
             return (255, 255, 102)
         elif color_text == "PURPLE" or color_text == "PURPLE\n":
@@ -1270,6 +1284,11 @@ class World:
     ##########################################################################################################
 
     def __read_line(self, line):
+        '''
+        Parses a line of the initial state text file
+        :param line: line to parse
+        '''
+
         # actual parsing of the text file
         line_parts = line.split(" ")
         
@@ -1358,6 +1377,11 @@ class World:
 
     # Parses agent choices text file
     def __read_agent_line(self, agent_num, line):
+        '''
+        Parses a line of the agent choices text file
+        :param agent_num: unique int assosciated with an agent
+        :param line: line in the agent input file
+        '''
 
         line_parts = line.split(" ")
         
@@ -1366,9 +1390,9 @@ class World:
 
     ##########################################################################################################
     
-
-    # Draws world
     def __draw(self):
+        '''Draws world'''
+
         # Reset screen
         self.screen.fill((0, 0, 0))
 
@@ -1470,6 +1494,11 @@ class World:
     ##########################################################################################################
 
     def __update(self, keys):
+        '''
+        Advances world by one frame
+        :param keys: list of keys pressed
+        '''
+
 
         # Clear list of hexes to double-check for superimposed idents
         # TODO: We should be able to delete this, as the while loop that checks for superimposition pops until this list is empty
@@ -1565,7 +1594,8 @@ class World:
     ##########################################################################################################
 
     def __backstep(self):
-        # Reverts every hex to how it was one state back.
+        '''Reverts every hex to how it was one state back.'''
+
         # Each ident holds its own history of the past 5 steps at any given time.
         # Because the code is deterministic, the next step will be re-calculated the same way.
         
@@ -1623,6 +1653,8 @@ class World:
     ##########################################################################################################
 
     def run(self):
+        '''Runs simulation'''
+
         run = True
 
         state = "pause"
