@@ -5,9 +5,6 @@ import pygame
 import sys
 import inspect
 import heapq, random
-# Debugger
-import pdb
-
 
 # # Code from pacman repo -> search.py
 class PriorityQueue:
