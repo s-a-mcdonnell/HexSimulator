@@ -18,6 +18,9 @@ class PriorityQueue:
       data structure allows O(1) access to the lowest-priority item.
     """
     def  __init__(self):
+        '''
+        PriorityQueue constructor
+        '''
         self.heap = []
         self.count = 0
 
