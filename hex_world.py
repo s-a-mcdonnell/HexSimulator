@@ -1539,7 +1539,6 @@ class World:
             self.ident_list.append(new_ident)
         
         # Move idents between portals
-        # TODO: Maintain separate portal list?
         self.__handle_portals()
 
         self.frames_created += 1
@@ -1672,10 +1671,8 @@ class World:
             # Draw a small red square
             pygame.draw.rect(self.screen, (255, 0, 0), pygame.Rect(10, 10, 20, 20))
             
-            # TODO: insert info page here as image on screen possibly with drawing
             print()   
             print("It took " + str(self.frames_created) + " frames to get into the goal.")
-            # TODO: add more info to this: something about where the goal was located (matrix coords) and which hex went into it? (ident/color)
             pygame.display.update()
             while(self.goalEnd):
                 for event in pygame.event.get():
