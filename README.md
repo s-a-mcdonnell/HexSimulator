@@ -11,7 +11,7 @@ To install dependencies: <br/>
 `pip install -r requirements.txt` <br/>
 
 To run the simulation: <br/>
-Describe the start state in `initial_state.txt` <br/>
+Describe the start state in `initial_state.txt`. <br/>
 `python hex_tester.py` (or use `python3`, `py`, etc. as required by your operating system and version of Python).
 
 ## How to Use
