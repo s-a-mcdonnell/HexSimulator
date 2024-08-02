@@ -12,7 +12,8 @@ To install dependencies: <br/>
 
 To run the simulation: <br/>
 Describe the start state in `initial_state.txt`. <br/>
-`python hex_tester.py` (or use `python3`, `py`, etc. as required by your operating system and version of Python).
+Run either `python hex_tester.py`or `python astar_tester.py` (or use `python3`, `py`, etc. as required by your operating system and version of Python).<br/>
+If run with `hex_tester.py`, all agents will be keyboard agents (controlled by the user). If run using `astar_tester.py`, all agents will operate autonomously according to the A* search algorithm.
 
 ## How to Use
 The initial state of the world must be described in `initial_state.txt`. Each identity (moving objects, stationary objects, agents, walls, etc.) must be listed on a new line of `initial_state.txt`, but the order in which they are listed is insubstantial. <br/>
@@ -43,8 +44,7 @@ For example, `9 6 move MAROON 5` <br/> describes a maroon identity located at (9
 Valid color keywords are PINK, RED, ORANGE, YELLOW, GREEN, BLUE, CYAN, PURPLE, MAROON, and BROWN. If an invalid color is provided, the default is grey.<br/>
 
 Agents, which are able to influence their own movement, are described with very similar syntax.<br/>
-`<column> <row> agent <COLOR> <agent type>`<br/>
-__[describe agent types]__
+`<column> <row> agent <COLOR>`<br/>
 
 Goals are described with the following syntax:<br/>
 `<column> <row> goal`<br/>
