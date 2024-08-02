@@ -39,9 +39,11 @@ In HexWorld, an identity can either be stationary or moving in one of six direct
 A regular (non-agent) moving identity is described using the following syntax: <br/>
 `<column> <row> move <COLOR> <direction>` <br/>
 For example, `9 6 move MAROON 5` <br/> describes a maroon identity located at (9, 6) moving in direction 5 (upper left). <br/>
-Valid color keywords are PINK, RED, ORANGE, YELLOW, GREEN, BLUE, CYAN, PURPLE, MAROON, and BROWN. If an invalid color is provided, the default is grey.
+Valid color keywords are PINK, RED, ORANGE, YELLOW, GREEN, BLUE, CYAN, PURPLE, MAROON, and BROWN. If an invalid color is provided, the default is grey.<br/>
 
-__[describe agents]__ (swap "move" for "agent")<br/>
+Agents, which are able to influence their own movement, are described with very similar syntax.<br/>
+`<column> <row> agent <COLOR> <agent type>`<br/>
+__[describe agent types]__
 
 Goals are described with the following syntax:<br/>
 `<column> <row> goal`<br/>
