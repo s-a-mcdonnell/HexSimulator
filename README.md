@@ -31,7 +31,8 @@ For more information on axial coordinates, see [Red Blob Games](https://www.redb
 ### Directions of Motion
 In HexWorld, an identity can either be stationary or moving in one of six directions. These six directions are labelled with the integers 0 through 5, moving clockwise, starting from the top, as shown in the following diagram. <br/>
 
-![HexWorld Directions Diagram](https://github.com/user-attachments/assets/423e3ea8-26bc-4518-8ab6-3f8c55fe8970)
+![HexWorld Directions Diagram Mini](https://github.com/user-attachments/assets/c7b64bcd-9208-4e76-b61d-048874a3facb)
+
 
 
 ### Describing Identities
