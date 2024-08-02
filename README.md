@@ -44,7 +44,7 @@ For example, `9 6 move MAROON 5` <br/> describes a maroon identity located at (9
 Valid color keywords are PINK, RED, ORANGE, YELLOW, GREEN, BLUE, CYAN, PURPLE, MAROON, and BROWN. If an invalid color is provided, the default is grey.<br/>
 
 Agents, which are able to influence their own movement, are described with very similar syntax.<br/>
-`<column> <row> agent <COLOR>`<br/>
+`<column> <row> agent <COLOR> <direction>`<br/>
 
 Goals are described with the following syntax:<br/>
 `<column> <row> goal`<br/>
