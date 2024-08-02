@@ -21,7 +21,12 @@ There are a few things that will be helpful to know when describing an initial s
 
 ### Grid Layout
 
-__[describe column, row system]__
+Locations in HexWorld are described using axial coordiantes, meaning locations are given in (column, row) pairs, with (0, 0) being the upper left corner.<br/>
+Columns run vertically (from top to bottom), and rows run diagonally from upper left to lower right. The following diagram shows the coordinates of six hexes relative to their neighbor (a, b).<br/>
+
+![Axial Coordinates Diagram](https://github.com/user-attachments/assets/40e0914d-c927-47d9-afba-3eb113ffb882)
+
+For more information on axial coordinates, see [Red Blob Games](https://www.redblobgames.com/grids/hexagons/#:~:text=Axial%20coordinates).
 
 ### Directions of Motion
 In HexWorld, an identity can either be stationary or moving in one of six directions. These six directions are labelled with the integers 0 through 5, moving clockwise, starting from the top, as shown in the following diagram. <br/>
