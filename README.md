@@ -7,8 +7,12 @@ HexWorld was created by Skyler McDonnell (@s-a-mcdonnell), Allison Klingler (@am
 The implementation of the A* Search algorithm for hex agents was done by Nahia and Richa.
 
 ## How to Install/Run
+To install dependencies: <br/>
+`pip install -r requirements.txt` <br/>
 
-`pip install -r requirements.txt`
+To run the simulation: <br/>
+Describe the start state in `initial_state.txt` <br/>
+`python hex_tester.py` (or use `python3`, `py`, etc. as required by your operating system and version of Python).
 
 ## How to Use
 
