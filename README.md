@@ -17,9 +17,19 @@ Describe the start state in `initial_state.txt` <br/>
 ## How to Use
 The initial state of the world must be described in `initial_state.txt`. Each identity (moving objects, stationary objects, agents, walls, etc.) must be listed on a new line of `initial_state.txt`, but the order in which they are listed is insubstantial. <br/>
 
+There are a few things that will be helpful to know when describing an initial state.<br/>
+
+### Grid Layout
+
 __[describe column, row system]__
 
-__[describe directions 0 through 6]__
+### Directions of Motion
+In HexWorld, an identity can either be stationary or moving in one of six directions. These six directions are labelled with the integers 0 through 5, moving clockwise, starting from the top, as shown in the following diagram. <br/>
+
+![HexWorld Directions Diagram](https://github.com/user-attachments/assets/423e3ea8-26bc-4518-8ab6-3f8c55fe8970)
+
+
+### Describing Identities
 
 A regular (non-agent) moving identity is described using the following syntax: <br/>
 `<column> <row> move <COLOR> <direction>` <br/>
